@@ -1,0 +1,182 @@
+{% extends 'base.html' %}
+
+{% block title %}2coins | Registration{% endblock %}
+
+{% block extra_css %}
+    <style>
+        body {
+            min-height: 100vh;
+            background: #f8fafc;
+        }
+
+        .register-wrapper {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem 1rem;
+        }
+
+        .register-card {
+            width: 100%;
+            max-width: 520px;
+            background: #fff;
+            border: 1px solid #e9ecef;
+            border-radius: 1rem;
+            box-shadow: 0 0.75rem 2rem rgba(0, 0, 0, 0.06);
+            padding: 2rem;
+        }
+
+        .register-brand {
+            font-size: 1.75rem;
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 0.25rem;
+        }
+
+        .register-subtitle {
+            text-align: center;
+            color: #6c757d;
+            margin-bottom: 1.75rem;
+        }
+
+        .form-floating {
+            margin-bottom: 1rem;
+        }
+
+        .form-help-text {
+            display: block;
+            margin-top: 0.4rem;
+            font-size: 0.875rem;
+            color: #6c757d;
+        }
+
+        .btn-register {
+            padding-top: 0.8rem;
+            padding-bottom: 0.8rem;
+            font-weight: 500;
+        }
+
+        .register-footer {
+            text-align: center;
+            margin-top: 1.25rem;
+            font-size: 0.95rem;
+            color: #6c757d;
+        }
+
+        .register-footer a {
+            text-decoration: none;
+        }
+
+        .register-footer a:hover {
+            text-decoration: underline;
+        }
+
+        .errorlist {
+            list-style: none;
+            padding-left: 0;
+            margin: 0 0 1rem 0;
+            color: #dc3545;
+            font-size: 0.875rem;
+        }
+    </style>
+{% endblock %}
+
+{% block body %}
+    <div class="register-wrapper">
+        <main class="register-card">
+            <form action="{% url 'register' %}" method="post" novalidate>
+                {% csrf_token %}
+
+                <div class="register-brand">2coins</div>
+                <p class="register-subtitle">Create your account</p>
+
+                {% if form.non_field_errors %}
+                    <ul class="errorlist">
+                        {% for error in form.non_field_errors %}
+                            <li>{{ error }}</li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+
+                {% for field in form %}
+                    {% if field.name == 'email' %}
+                        <div class="form-floating">
+                            <input
+                                    type="email"
+                                    class="form-control {% if field.errors %}is-invalid{% endif %}"
+                                    id="id_email"
+                                    name="email"
+                                    placeholder="name@example.com"
+                                    autocomplete="email"
+                                    required
+                                    {% if field.value %}value="{{ field.value }}"{% endif %}
+                            >
+                            <label for="id_email">Email address</label>
+                            {% for error in field.errors %}
+                                <div class="invalid-feedback d-block">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                    {% elif field.name == 'password1' %}
+                        <div class="form-floating">
+                            <input
+                                    type="password"
+                                    class="form-control {% if field.errors %}is-invalid{% endif %}"
+                                    id="id_password1"
+                                    name="password1"
+                                    placeholder="Password"
+                                    autocomplete="new-password"
+                                    required
+                            >
+                            <label for="id_password1">Password</label>
+                            {% for error in field.errors %}
+                                <div class="invalid-feedback d-block">{{ error }}</div>
+                            {% endfor %}
+                            {% if field.help_text %}
+                                <small class="form-help-text">{{ field.help_text|safe }}</small>
+                            {% endif %}
+                        </div>
+                    {% elif field.name == 'password2' %}
+                        <div class="form-floating">
+                            <input
+                                    type="password"
+                                    class="form-control {% if field.errors %}is-invalid{% endif %}"
+                                    id="id_password2"
+                                    name="password2"
+                                    placeholder="Confirm password"
+                                    autocomplete="new-password"
+                                    required
+                            >
+                            <label for="id_password2">Confirm password</label>
+                            {% for error in field.errors %}
+                                <div class="invalid-feedback d-block">{{ error }}</div>
+                            {% endfor %}
+                            {% if field.help_text %}
+                                <small class="form-help-text">{{ field.help_text|safe }}</small>
+                            {% endif %}
+                        </div>
+                    {% else %}
+                        <div class="form-floating">
+                            {{ field }}
+                            <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                            {% for error in field.errors %}
+                                <div class="invalid-feedback d-block">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                {% endfor %}
+
+                <div class="d-grid mt-3">
+                    <button type="submit" class="btn btn-primary btn-register">
+                        Create account
+                    </button>
+                </div>
+
+                <div class="register-footer">
+                    Already have an account?
+                    <a href="{% url 'login' %}">Sign in</a>
+                </div>
+            </form>
+        </main>
+    </div>
+{% endblock %}
