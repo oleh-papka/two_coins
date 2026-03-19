@@ -1,116 +1,42 @@
 {% extends 'base.html' %}
 
-{% block title %}2coins | Login{% endblock %}
-
-{% block extra_css %}
-    <style>
-        body {
-            min-height: 100vh;
-            background: #f8fafc;
-        }
-
-        .login-wrapper {
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 2rem 1rem;
-        }
-
-        .login-card {
-            width: 100%;
-            max-width: 420px;
-            background: #fff;
-            border: 1px solid #e9ecef;
-            border-radius: 1rem;
-            box-shadow: 0 0.75rem 2rem rgba(0, 0, 0, 0.06);
-            padding: 2rem;
-        }
-
-        .login-brand {
-            font-size: 1.75rem;
-            font-weight: 700;
-            text-align: center;
-            margin-bottom: 0.25rem;
-        }
-
-        .login-subtitle {
-            text-align: center;
-            color: #6c757d;
-            margin-bottom: 1.75rem;
-        }
-
-        .form-floating + .form-floating {
-            margin-top: 1rem;
-        }
-
-        .btn-login {
-            padding-top: 0.8rem;
-            padding-bottom: 0.8rem;
-            font-weight: 500;
-        }
-
-        .login-footer {
-            text-align: center;
-            margin-top: 1.25rem;
-            font-size: 0.95rem;
-            color: #6c757d;
-        }
-
-        .login-footer a {
-            text-decoration: none;
-        }
-
-        .login-footer a:hover {
-            text-decoration: underline;
-        }
-    </style>
-{% endblock %}
+{% block title %}🪙 2coins | Login{% endblock %}
 
 {% block body %}
-    <div class="login-wrapper">
-        <main class="login-card">
-            <form method="post">
-                {% csrf_token %}
+    <div id="login-wrapper" class="d-flex justify-content-center align-items-center vh-100">
 
-                <div class="login-brand">2coins</div>
-                <p class="login-subtitle">Sign in to your account</p>
+        <div class="card col-3" style="max-width: 600px; min-width: 400px; margin: 0 auto;">
+            <div class="card-body p-4">
+                <h1 class="text-center mb-4">🪙 2coins Login</h1>
+                <form method="post">
+                    {% csrf_token %}
 
-                <div class="form-floating">
-                    <input
-                            type="email"
-                            class="form-control"
-                            id="floatingInput"
-                            name="email"
-                            placeholder="name@example.com"
-                            autocomplete="email"
-                            required
-                    >
-                    <label for="floatingInput">Email address</label>
-                </div>
+                    <div class="mb-3">
+                        <label for="id_email" class="form-label">Email address</label>
+                        <input type="email" class="form-control" id="id_email" name="email"
+                               placeholder="name@example.com"
+                               autocomplete="email" required>
 
-                <div class="form-floating my-4">
-                    <input
-                            type="password"
-                            class="form-control"
-                            id="floatingPassword"
-                            name="password"
-                            placeholder="Password"
-                            autocomplete="current-password"
-                            required
-                    >
-                    <label for="floatingPassword">Password</label>
-                </div>
+                    </div>
 
-                <button class="btn btn-primary w-100 btn-login" type="submit">
-                    Sign in
-                </button>
+                    <div class="mb-3">
+                        <label for="id_password" class="form-label">Password</label>
+                        <input type="password" class="form-control" id="id_password" name="password"
+                               placeholder="Password"
+                               autocomplete="current-password" required>
+                    </div>
 
-                <div class="login-footer">
-                    Don’t have an account?
-                    <a href="{% url 'register' %}">Create one</a>
-                </div>
-            </form>
-        </main>
+                    <button class="btn btn-primary w-100 my-2" type="submit">
+                        Log in
+                    </button>
+
+                    <div class="login-footer">
+                        Don’t have an account?
+                        <a href="{% url 'register' %}">Create one</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+
     </div>
 {% endblock %}
