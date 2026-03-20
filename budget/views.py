@@ -114,3 +114,9 @@ class CategoryCreateView(LoginRequiredMixin, CreateView):
         if category_type:
             form.fields["category_type"].initial = category_type
         return form
+
+
+class CategoryDetailView(LoginRequiredMixin, DetailView):
+    login_url = 'login'
+    model = Category
+    template_name = 'category_details.html'

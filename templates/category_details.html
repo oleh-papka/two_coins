@@ -1,0 +1,83 @@
+{% extends 'index.html' %}
+
+{% block title %}🪙 2coins{% if title %} | {{ title }}{% else %}{% endif %}{% endblock %}
+
+{% block content %}
+    <div class="d-flex flex-wrap justify-content-center gap-3">
+        <div class="col" style="min-width: 20rem; max-width: 30rem;">
+            <div class="card border-dark mb-3">
+                <h3 class="card-header">
+                    {{ object.icon|default:'💳' }} {{ object.name }}
+                </h3>
+
+                <div class="card-body">
+                    <div class="d-flex justify-content-between gap-2">
+                        <a href="#" class="btn btn-primary">Add transaction</a>
+
+                        <div class="btn-group" role="group">
+                            <button class="btn" onclick="location.href = '{% url 'category_update' object.pk %}';">
+                                <i class="bi bi-gear"></i>
+                            </button>
+                            <button class="btn btn-danger">
+                                <i class="bi bi-trash3"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item text-success d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">Income:</h5>
+                        <h5 class="mb-0"></h5>
+                    </li>
+                    <li class="list-group-item text-danger d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">Expenses:</h5>
+                        <h5 class="mb-0"></h5>
+                    </li>
+
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">Total:</h5>
+                        <h5 class="mb-0"></h5>
+                    </li>
+                </ul>
+
+                <div class="card-footer text-muted text-center p-1">
+                    <small>
+                        As of {% now 'F Y' %}
+                    </small>
+                </div>
+            </div>
+
+            <div class="card overflow-hidden">
+                <h3 class="card-header">
+                    Transactions
+                </h3>
+
+                <div class="card-body p-0">
+                    <table class="table table-striped mb-0" style="border: transparent;">
+                        <tbody>
+                        <tr>
+                            <td></td>
+                            <td class="text-center"><span class="badge"></span></td>
+                            <td class="text-end"></td>
+                            <td class="text-center">
+                                <a href="#"><i class="bi bi-three-dots-vertical"></i></a>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="col">
+            <div class="card border-dark" style="min-width: 30rem;">
+                <h3 class="card-header">
+                    Stats
+                </h3>
+
+                <div class="card-body"></div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

@@ -43,7 +43,7 @@
                                 </div>
                             </div>
 
-                            <a href="{% url 'dashboard' %}" class="stretched-link"></a>
+                            <a href="{% url 'category_detail' object.pk %}" class="stretched-link"></a>
                         </div>
                     {% endif %}
                 {% endfor %}
@@ -73,7 +73,7 @@
                                 </div>
                             </div>
 
-                            <a href="{% url 'dashboard' %}" class="stretched-link"></a>
+                            <a href="{% url  'category_detail' object.pk %}" class="stretched-link"></a>
                         </div>
                     {% endif %}
                 {% endfor %}
