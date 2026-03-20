@@ -1,3 +1,8 @@
 from django.contrib import admin
 
-# Register your models here.
+from budget.models import Account, Category, Currency
+
+
+@admin.register(Account, Currency, Category)
+class BudgetAdmin(admin.ModelAdmin):
+    pass

@@ -1,0 +1,30 @@
+{% extends 'index.html' %}
+
+
+{% block title %}🪙 2coins{% if title %} | {{ title }}{% else %}{% endif %}{% endblock %}
+
+{% block content %}
+    <div class="d-flex gap-3">
+        {% for object in object_list %}
+            <div class="card border-dark mb-3" style="max-width: 20rem; min-width: 250px">
+
+                <h3 class="card-header ">{{ object.icon|default:'💳' }} {{ object.name }}</h3>
+
+                <div class="card-body">
+                    <h2 class="card-title">{{ object.currency.symbol }} {{ object.balance }} </h2>
+                    <h6 class="card-subtitle mb-3 text-muted">{{ object.description|default:'&nbsp;' }}</h6>
+
+                    <div class="d-flex justify-content-end gap-1 position-relative" style="z-index: 2;">
+                        <a href="#" class="btn btn-primary">Add transaction</a>
+                        <a href="#" class="btn"><i class="bi bi-gear"></i></a>
+                    </div>
+                </div>
+
+                <a href="{% url 'dashboard' %}" class="stretched-link"></a>
+            </div>
+        {% endfor %}
+    </div>
+
+
+
+{% endblock %}

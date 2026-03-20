@@ -37,7 +37,7 @@
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link px-3" href="#">
+                        <a class="nav-link px-3" href="{% url 'account_list' %}">
                             Accounts
                         </a>
                     </li>
@@ -100,9 +100,9 @@
         </div>
     </nav>
 
+    <div class="container-lg">
 
-    {% block content %}
-        <div class="container-lg">
+        {% block content %}
             <div class="card mb-3">
                 <h3 class="card-header">Card header</h3>
                 <div class="card-body">
@@ -143,8 +143,9 @@
                     <a href="#" class="card-link">Another link</a>
                 </div>
             </div>
-        </div>
-    {% endblock %}
+        {% endblock %}
+
+    </div>
 {% endblock %}
 
 

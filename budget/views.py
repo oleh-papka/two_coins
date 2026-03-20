@@ -12,7 +12,13 @@ class DashboardView(LoginRequiredMixin, TemplateView):
 class AccountListView(LoginRequiredMixin, ListView):
     login_url = 'login'
     model = Account
-    template_name = ''
+    template_name = 'list.html'
 
     def get_queryset(self):
         return super().get_queryset().filter(user=self.request.user)
+
+    def get_context_data(self, **kwargs):
+        ctx = super().get_context_data(**kwargs)
+
+        ctx['title'] = 'Accounts'
+        return ctx
