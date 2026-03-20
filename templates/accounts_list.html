@@ -3,10 +3,23 @@
 
 {% block title %}🪙 2coins{% if title %} | {{ title }}{% else %}{% endif %}{% endblock %}
 
+{% block extra_css %}
+    {{ block.super }}
+    <style>
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 1.3rem;
+            justify-items: center;
+            align-items: start;
+        }
+    </style>
+{% endblock %}
+
 {% block content %}
-    <div class="d-flex gap-3">
+    <div class="card-grid mb-3">
         {% for object in object_list %}
-            <div class="card border-dark mb-3" style="max-width: 20rem; min-width: 250px">
+            <div class="card border-dark" style="max-width: 20rem; min-width: 250px">
 
                 <h3 class="card-header ">{{ object.icon|default:'💳' }} {{ object.name }}</h3>
 
@@ -24,7 +37,4 @@
             </div>
         {% endfor %}
     </div>
-
-
-
 {% endblock %}

@@ -37,12 +37,14 @@
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link px-3" href="{% url 'account_list' %}">
+                        <a class="nav-link px-3 {% if request.resolver_match.url_name == 'account_list' %}active{% endif %}"
+                           href="{% url 'account_list' %}">
                             Accounts
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link px-3" href="#">
+                        <a class="nav-link px-3 {% if request.resolver_match.url_name == 'category_list' %}active{% endif %}"
+                           href="{% url 'category_list' %}">
                             Categories
                         </a>
                     </li>
