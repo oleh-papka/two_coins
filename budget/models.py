@@ -106,6 +106,9 @@ class Category(TimeStampMixin, StyleMixin):
     def __str__(self):
         return f"{self.name} category"
 
+    def get_absolute_url(self):
+        return reverse('category_list')
+
 
 class Transaction(TimeStampMixin):
     account = models.ForeignKey(null=False,
