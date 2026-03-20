@@ -1,0 +1,198 @@
+{% extends 'base.html' %}
+
+{% block title %}🪙 2coins | Dashboard{% endblock %}
+
+{% block extra_css %}
+    <style>
+        {# Custom nav styling #}
+        .navbar .nav:not(.nav-tabs, .nav-pills) .nav-link.active {
+            font-weight: 700;
+        }
+
+        .navbar .nav-link {
+            color: black !important;
+        }
+    </style>
+{% endblock %}
+
+
+{% block body %}
+    <nav class="navbar navbar-expand-lg sticky-top bg-primary border-bottom shadow-sm mb-4">
+        <div class="container-xl" style="max-width: 1400px;">
+            <a class="navbar-brand fw-semibold d-flex align-items-center gap-2" href="{% url 'dashboard' %}">
+                <h2>🪙 2coins</h2>
+            </a>
+
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavbar"
+                    aria-controls="mainNavbar" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="mainNavbar">
+                <ul class="nav navbar-nav mx-auto mb-2 mb-lg-0 gap-2">
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}"
+                           href="{% url 'dashboard' %}">
+                            Dashboard
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link px-3" href="#">
+                            Accounts
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link px-3" href="#">
+                            Categories
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link px-3" href="#">
+                            Transactions
+                        </a>
+                    </li>
+
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="theme-menu"
+                           aria-expanded="false" data-bs-toggle="dropdown" data-bs-display="static"
+                           aria-label="Toggle theme">
+                            <i class="bi bi-circle-half"></i>
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li>
+                                <button type="button" class="dropdown-item d-flex align-items-center"
+                                        data-bs-theme-value="light" aria-pressed="false">
+                                    <i class="bi bi-sun-fill"></i><span class="ms-2">Light</span>
+                                </button>
+                            </li>
+                            <li>
+                                <button type="button" class="dropdown-item d-flex align-items-center"
+                                        data-bs-theme-value="dark" aria-pressed="true">
+                                    <i class="bi bi-moon-stars-fill"></i><span class="ms-2">Dark</span>
+                                </button>
+                            </li>
+                        </ul>
+                    </li>
+
+                </ul>
+
+                <div class="d-flex align-items-center gap-2">
+                    <a href="#" class="btn px-3 bg-body">
+                        Add Transaction
+                    </a>
+
+                    <div class="dropdown">
+                        <button class="btn px-3 dropdown-toggle bg-body" type="button"
+                                data-bs-toggle="dropdown" aria-expanded="false">
+                            Profile
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><a class="dropdown-item" href="#">Settings</a></li>
+                            <li><a class="dropdown-item" href="#">Profile</a></li>
+                            <li>
+                                <hr class="dropdown-divider">
+                            </li>
+                            <li><a class="dropdown-item" href="#">Logout</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+
+    {% block content %}
+        <div class="container-lg">
+            <div class="card mb-3">
+                <h3 class="card-header">Card header</h3>
+                <div class="card-body">
+                    <h5 class="card-title">Special title treatment</h5>
+                    <h6 class="card-subtitle text-muted">Support card subtitle</h6>
+                </div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="d-block user-select-none" width="100%" height="200"
+                     aria-label="Placeholder: Image cap" focusable="false" role="img"
+                     preserveAspectRatio="xMidYMid slice" viewBox="0 0 318 180"
+                     style="font-size:1.125rem;text-anchor:middle">
+                    <rect width="100%" height="100%" fill="#868e96"></rect>
+                    <text x="50%" y="50%" fill="#dee2e6" dy=".3em">Image cap</text>
+                </svg>
+                <div class="card-body">
+                    <p class="card-text">Some quick example text to build on the card title and make up the bulk of the
+                        card's content.</p>
+                </div>
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item">Cras justo odio</li>
+                    <li class="list-group-item">Dapibus ac facilisis in</li>
+                    <li class="list-group-item">Vestibulum at eros</li>
+                </ul>
+                <div class="card-body">
+                    <a href="#" class="card-link">Card link</a>
+                    <a href="#" class="card-link">Another link</a>
+                </div>
+                <div class="card-footer text-muted">
+                    2 days ago
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-body">
+                    <h4 class="card-title">Card title</h4>
+                    <h6 class="card-subtitle mb-2 text-muted">Card subtitle</h6>
+                    <p class="card-text">Some quick example text to build on the card title and make up the bulk of the
+                        card's content.</p>
+                    <a href="#" class="card-link">Card link</a>
+                    <a href="#" class="card-link">Another link</a>
+                </div>
+            </div>
+        </div>
+    {% endblock %}
+{% endblock %}
+
+
+{% block extra_js %}
+    <script>
+        (() => {
+            const getStoredTheme = () => localStorage.getItem('theme')
+            const setStoredTheme = theme => localStorage.setItem('theme', theme)
+
+            const getPreferredTheme = () => {
+                const storedTheme = getStoredTheme()
+                if (storedTheme) {
+                    return storedTheme
+                }
+                return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
+            }
+
+            const setTheme = theme => {
+                document.documentElement.setAttribute('data-bs-theme', theme)
+            }
+
+            const updateActiveThemeButton = theme => {
+                const themeButtons = document.querySelectorAll('[data-bs-theme-value]')
+                themeButtons.forEach(btn => {
+                    const isActive = btn.getAttribute('data-bs-theme-value') === theme
+                    btn.setAttribute('aria-pressed', isActive ? 'true' : 'false')
+                    btn.classList.toggle('active', isActive)
+                })
+            }
+
+            const initTheme = () => {
+                const theme = getPreferredTheme()
+                setTheme(theme)
+                updateActiveThemeButton(theme)
+            }
+
+            document.addEventListener('DOMContentLoaded', () => {
+                initTheme()
+
+                document.querySelectorAll('[data-bs-theme-value]').forEach(button => {
+                    button.addEventListener('click', () => {
+                        const theme = button.getAttribute('data-bs-theme-value')
+                        setStoredTheme(theme)
+                        setTheme(theme)
+                        updateActiveThemeButton(theme)
+                    })
+                })
+            })
+        })()
+    </script>
+{% endblock %}
