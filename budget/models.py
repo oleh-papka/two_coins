@@ -4,6 +4,7 @@ from django.core.exceptions import ValidationError
 from django.db import models
 from django.db import transaction as db_transaction
 from django.db.models import F
+from django.urls import reverse
 from django.utils import timezone
 
 from core.models import TimeStampMixin, StyleMixin
@@ -45,7 +46,7 @@ class Account(TimeStampMixin, StyleMixin):
                                  related_name="+")
     description = models.CharField(null=True,
                                    blank=True,
-                                   max_length=30,
+                                   max_length=50,
                                    verbose_name="Description")
 
     class Meta:
@@ -73,6 +74,9 @@ class Account(TimeStampMixin, StyleMixin):
         amount = abs(amount)
         Account.objects.filter(pk=self.pk).update(balance=F("balance") + amount)
         self.refresh_from_db(fields=["balance"])
+
+    def get_absolute_url(self):
+        return reverse('account_list')
 
 
 class Category(TimeStampMixin, StyleMixin):

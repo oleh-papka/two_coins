@@ -18,7 +18,7 @@ class StyleMixin(models.Model):
                              help_text="Color in HEX format")
     icon = models.CharField(null=True,
                             blank=True,
-                            max_length=1,
+                            max_length=10,
                             verbose_name="Emoji icon")
 
     class Meta:
