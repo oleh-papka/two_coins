@@ -17,7 +17,7 @@
 {% endblock %}
 
 {% block content %}
-    <div class="card-grid mb-3">
+    <div class="card-grid mb-3 tab-content bg-body-tertiary">
         {% for object in object_list %}
             <div class="card border-dark" style="max-width: 20rem; min-width: 250px">
 
@@ -27,13 +27,13 @@
                     <h2 class="card-title">{{ object.currency.symbol }} {{ object.balance }} </h2>
                     <h6 class="card-subtitle mb-3 text-muted">{{ object.description|default:'&nbsp;' }}</h6>
 
-                    <div class="d-flex justify-content-end gap-1 position-relative" style="z-index: 2;">
+                    <div class="d-flex justify-content-end gap-2 position-relative" style="z-index: 2;">
                         <a href="#" class="btn btn-primary flex-grow-1">Add transaction</a>
                         <a href="{% url 'account_update' object.pk %}" class="btn"><i class="bi bi-gear"></i></a>
                     </div>
                 </div>
 
-                <a href="{% url 'dashboard' %}" class="stretched-link"></a>
+                <a href="{% url 'account_detail' object.pk %}" class="stretched-link"></a>
             </div>
         {% endfor %}
 

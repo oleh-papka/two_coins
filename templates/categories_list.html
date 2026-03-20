@@ -36,7 +36,7 @@
                             <h3 class="card-header">{{ object.icon|default:'💳' }} {{ object.name }}</h3>
 
                             <div class="card-body">
-                                <div class="d-flex gap-1 position-relative" style="z-index: 2;">
+                                <div class="d-flex gap-2 position-relative" style="z-index: 2;">
                                     <a href="#" class="btn btn-primary flex-grow-1">Add expense</a>
                                     <a href="{% url 'category_update' object.pk %}" class="btn">
                                         <i class="bi bi-gear"></i></a>
@@ -66,7 +66,7 @@
                             <h3 class="card-header ">{{ object.icon|default:'💳' }} {{ object.name }}</h3>
 
                             <div class="card-body">
-                                <div class="d-flex gap-1 position-relative" style="z-index: 2;">
+                                <div class="d-flex gap-2 position-relative" style="z-index: 2;">
                                     <a href="#" class="btn btn-primary flex-grow-1">Add income</a>
                                     <a href="{% url 'category_update' object.pk %}" class="btn">
                                         <i class="bi bi-gear"></i></a>

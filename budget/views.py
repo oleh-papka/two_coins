@@ -1,5 +1,5 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.views.generic import ListView, TemplateView, UpdateView, CreateView
+from django.views.generic import ListView, TemplateView, UpdateView, CreateView, DetailView
 
 from budget.forms.account import AccountForm
 from budget.forms.category import CategoryForm
@@ -55,6 +55,12 @@ class AccountCreateView(LoginRequiredMixin, CreateView):
     def form_valid(self, form):
         form.instance.user = self.request.user
         return super().form_valid(form)
+
+
+class AccountDetailView(LoginRequiredMixin, DetailView):
+    login_url = 'login'
+    model = Account
+    template_name = 'account_details.html'
 
 
 class CategoryListView(LoginRequiredMixin, ListView):

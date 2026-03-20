@@ -76,7 +76,7 @@ class Account(TimeStampMixin, StyleMixin):
         self.refresh_from_db(fields=["balance"])
 
     def get_absolute_url(self):
-        return reverse('account_list')
+        return reverse('account_detail', kwargs={'pk': self.pk})
 
 
 class Category(TimeStampMixin, StyleMixin):
