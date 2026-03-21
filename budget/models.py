@@ -151,6 +151,9 @@ class Transaction(TimeStampMixin):
     def __str__(self):
         return f"Transaction of {self.account.name}"
 
+    def get_absolute_url(self):
+        return reverse('dashboard')
+
 
 class Transfer(TimeStampMixin):
     from_account = models.ForeignKey(Account, on_delete=models.CASCADE, related_name='+')

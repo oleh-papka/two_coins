@@ -15,7 +15,8 @@
                     <h6 class="card-subtitle mb-3 text-muted">{{ object.description|default:'&nbsp;' }}</h6>
 
                     <div class="d-flex justify-content-between gap-2">
-                        <a href="#" class="btn btn-primary">Add transaction</a>
+                        <a href="{% url 'transaction_add' %}?account={{ object.pk }}" class="btn btn-primary">Add
+                            transaction</a>
 
                         <div class="btn-group" role="group">
                             <button class="btn" onclick="location.href = '{% url 'account_update' object.pk %}';">
@@ -31,16 +32,16 @@
                 <ul class="list-group list-group-flush">
                     <li class="list-group-item text-success d-flex justify-content-between align-items-center">
                         <h5 class="mb-0">Income:</h5>
-                        <h5 class="mb-0"></h5>
+                        <h5 class="mb-0">{{ stats.income }} {{ object.currency.symbol }}</h5>
                     </li>
                     <li class="list-group-item text-danger d-flex justify-content-between align-items-center">
                         <h5 class="mb-0">Expenses:</h5>
-                        <h5 class="mb-0"></h5>
+                        <h5 class="mb-0">{{ stats.expenses }} {{ object.currency.symbol }}</h5>
                     </li>
 
                     <li class="list-group-item d-flex justify-content-between align-items-center">
                         <h5 class="mb-0">Total:</h5>
-                        <h5 class="mb-0"></h5>
+                        <h5 class="mb-0">{{ stats.total }} {{ object.currency.symbol }}</h5>
                     </li>
                 </ul>
 
@@ -59,14 +60,19 @@
                 <div class="card-body p-0">
                     <table class="table table-striped mb-0" style="border: transparent;">
                         <tbody>
-                        <tr>
-                            <td></td>
-                            <td class="text-center"><span class="badge"></span></td>
-                            <td class="text-end"></td>
-                            <td class="text-center">
-                                <a href="#"><i class="bi bi-three-dots-vertical"></i></a>
-                            </td>
-                        </tr>
+                        {% for txn in transactions %}
+                            <tr>
+                                <td>{{ txn.date }}</td>
+                                <td class="text-center"><span
+                                        class="badge {{ txn.badge_color }}">{{ txn.category }}</span></td>
+                                <td class="text-end {% if txn.amount > 0 %}text-success{% else %}text-danger{% endif %} ">{{ txn.amount }} {{ txn.currency }}</td>
+                                <td class="text-center">
+                                    <a href="{% url 'transaction_update' txn.id %}">
+                                        <i class="bi bi-three-dots-vertical"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                        {% endfor %}
                         </tbody>
                     </table>
                 </div>
