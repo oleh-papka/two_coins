@@ -9,7 +9,7 @@ from django.views.generic import ListView, TemplateView, UpdateView, CreateView,
 from budget.forms.account import AccountForm
 from budget.forms.category import CategoryForm
 from budget.forms.transaction import TransactionForm
-from budget.models import Account, Category, Transaction
+from budget.models import Account, Category, Transaction, Currency
 from budget.services.styling import StylingService
 
 
@@ -73,7 +73,11 @@ class AccountDetailView(LoginRequiredMixin, DetailView):
         ctx = super().get_context_data(**kwargs)
 
         txns = []
-        transactions = Transaction.objects.filter(account=self.object, performed_date__month=timezone.now().month)
+        transactions = (
+            Transaction.objects.filter(account=self.object,
+                                       performed_date__month=timezone.now().month).order_by('-performed_date')
+        )
+
         for transaction in transactions:
             txns.append({
                 'id': transaction.id,
@@ -81,7 +85,7 @@ class AccountDetailView(LoginRequiredMixin, DetailView):
                 'badge_color': StylingService.get_badge_bootstrap_color(transaction.category.color),
                 'date': transaction.performed_date.strftime('%d.%m.%Y'),
                 'amount': transaction.amount,
-                'currency': transaction.currency.symbol,
+                'currency': transaction.currency.symbol
             })
 
         ctx['transactions'] = txns
@@ -158,7 +162,11 @@ class CategoryDetailView(LoginRequiredMixin, DetailView):
         ctx = super().get_context_data(**kwargs)
 
         txns = []
-        transactions = Transaction.objects.filter(category=self.object, performed_date__month=timezone.now().month)
+        transactions = (
+            Transaction.objects.filter(category=self.object, performed_date__month=timezone.now().month).order_by(
+                '-performed_date')
+        )
+
         for transaction in transactions:
             txns.append({
                 'id': transaction.id,
@@ -180,13 +188,24 @@ class TransactionCreateView(LoginRequiredMixin, CreateView):
     login_url = 'login'
     model = Transaction
     form_class = TransactionForm
-    template_name = 'change_form.html'
+    template_name = 'transaction_change_form.html'
 
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
 
         ctx['title'] = f'Create {self.object}'
         ctx['model_name'] = 'Transaction'
+
+        ctx["account_currency_map"] = {
+            str(account.id): str(account.currency_id)
+            for account in Account.objects.select_related("currency")
+        }
+
+        ctx["currency_symbol_map"] = {
+            str(currency.id): currency.symbol
+            for currency in Currency.objects.all()
+        }
+
         return ctx
 
     def form_valid(self, form):
@@ -211,13 +230,24 @@ class TransactionUpdateView(LoginRequiredMixin, UpdateView):
     login_url = 'login'
     model = Transaction
     form_class = TransactionForm
-    template_name = 'change_form.html'
+    template_name = 'transaction_change_form.html'
 
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
 
         ctx['title'] = f'Update {self.object}'
         ctx['model_name'] = 'Transaction'
+
+        ctx["account_currency_map"] = {
+            str(account.id): str(account.currency_id)
+            for account in Account.objects.select_related("currency")
+        }
+
+        ctx["currency_symbol_map"] = {
+            str(currency.id): currency.symbol
+            for currency in Currency.objects.all()
+        }
+
         return ctx
 
     def form_valid(self, form):

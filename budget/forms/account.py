@@ -4,7 +4,7 @@ from budget.models import Account
 from core.mixins.forms import BootstrapFormMixin
 
 
-class AccountForm(forms.ModelForm, BootstrapFormMixin):
+class AccountForm(BootstrapFormMixin, forms.ModelForm):
     class Meta:
         model = Account
         fields = ('name', 'balance', 'currency', 'description', 'icon')

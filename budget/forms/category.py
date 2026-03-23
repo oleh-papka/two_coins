@@ -4,7 +4,7 @@ from budget.models import Category
 from core.mixins.forms import BootstrapFormMixin
 
 
-class CategoryForm(forms.ModelForm, BootstrapFormMixin):
+class CategoryForm(BootstrapFormMixin, forms.ModelForm):
     class Meta:
         model = Category
         fields = ('name', 'category_type', 'icon')

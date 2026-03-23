@@ -1,0 +1,102 @@
+{% extends 'change_form.html' %}
+
+{% block field_override %}
+    {% if field.name == 'account_amount' %}
+        <div class="input-group">
+            <input type="number" name="account_amount" step="0.01"
+                   class="form-control {% if field.errors %}is-invalid{% endif %}"
+                   placeholder="Amount in account's currency" id="id_account_amount">
+            <span class="input-group-text" id="account-amount-symbol">$</span>
+        </div>
+    {% else %}
+        {{ field }}
+    {% endif %}
+{% endblock %}
+
+
+{% block extra_js %}
+    {{ block.super }}
+
+    {{ account_currency_map|json_script:"account-currency-map" }}
+    {{ currency_symbol_map|json_script:"currency-symbol-map" }}
+    
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const accountCurrencyMap = JSON.parse(
+                document.getElementById("account-currency-map").textContent
+            );
+            const currencySymbolMap = JSON.parse(
+                document.getElementById("currency-symbol-map").textContent
+            );
+
+            const accountSelect = document.getElementById("id_account");
+            const amountCurrencySelect = document.getElementById("id_amount_currency_1");
+            const accountAmountInput = document.getElementById("id_account_amount");
+            const accountAmountRow = accountAmountInput.closest(".mb-3");
+            const accountAmountSymbol = document.getElementById("account-amount-symbol");
+            const accountAmountLabel = accountAmountRow.querySelector("label");
+
+            let requiredAsterisk = null;
+
+            if (accountAmountLabel) {
+                requiredAsterisk = accountAmountLabel.querySelector(".dynamic-required-asterisk");
+
+                if (!requiredAsterisk) {
+                    requiredAsterisk = document.createElement("span");
+                    requiredAsterisk.className = "dynamic-required-asterisk text-danger ms-1";
+                    requiredAsterisk.textContent = "*";
+                    requiredAsterisk.style.display = "none";
+                    accountAmountLabel.appendChild(requiredAsterisk);
+                }
+            }
+
+            function getAccountCurrencyId() {
+                const accountId = accountSelect.value;
+                return accountCurrencyMap[String(accountId)] || null;
+            }
+
+            function getSelectedAmountCurrencyId() {
+                return amountCurrencySelect.value || null;
+            }
+
+            function updateAccountAmountVisibility() {
+                const accountCurrencyId = getAccountCurrencyId();
+                const selectedAmountCurrencyId = getSelectedAmountCurrencyId();
+
+                const accountSymbol = currencySymbolMap[String(accountCurrencyId)] || "";
+                accountAmountSymbol.textContent = accountSymbol;
+
+                const shouldShow =
+                    accountCurrencyId &&
+                    selectedAmountCurrencyId &&
+                    String(accountCurrencyId) !== String(selectedAmountCurrencyId);
+
+                if (shouldShow) {
+                    accountAmountRow.classList.remove("d-none");
+                    accountAmountInput.required = true;
+                    accountAmountInput.setAttribute("aria-required", "true");
+
+                    if (requiredAsterisk) {
+                        requiredAsterisk.style.display = "";
+                    }
+                } else {
+                    accountAmountRow.classList.add("d-none");
+                    accountAmountInput.required = false;
+                    accountAmountInput.removeAttribute("aria-required");
+                    accountAmountInput.value = "";
+
+                    if (requiredAsterisk) {
+                        requiredAsterisk.style.display = "none";
+                    }
+                }
+            }
+
+            accountAmountRow.classList.add("d-none");
+            updateAccountAmountVisibility();
+
+            amountCurrencySelect.addEventListener("change", updateAccountAmountVisibility);
+            accountSelect.addEventListener("change", updateAccountAmountVisibility);
+        });
+    </script>
+{% endblock %}

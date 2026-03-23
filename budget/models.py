@@ -109,6 +109,14 @@ class Category(TimeStampMixin, StyleMixin):
     def get_absolute_url(self):
         return reverse('category_list')
 
+    @property
+    def is_income(self):
+        return self.category_type == self.CategoryType.INCOME
+
+    @property
+    def is_expense(self):
+        return self.category_type == self.CategoryType.EXPENSE
+
 
 class Transaction(TimeStampMixin):
     account = models.ForeignKey(null=False,
@@ -132,12 +140,17 @@ class Transaction(TimeStampMixin):
                                  max_digits=10,
                                  decimal_places=2,
                                  verbose_name="Amount")
-    amount_converted = models.DecimalField(null=True,
-                                           blank=True,
-                                           default=None,
-                                           max_digits=10,
-                                           decimal_places=2,
-                                           verbose_name="Amount in account's currency")
+    account_amount = models.DecimalField(null=True,
+                                         blank=True,
+                                         default=None,
+                                         max_digits=10,
+                                         decimal_places=2,
+                                         verbose_name="Amount in account's currency")
+    exchange_rate = models.DecimalField(max_digits=6,
+                                        decimal_places=3,
+                                        null=True,
+                                        blank=True,
+                                        verbose_name="Exchange rate to account currency")
     description = models.CharField(null=True,
                                    blank=True,
                                    max_length=50,

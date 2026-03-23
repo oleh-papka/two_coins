@@ -1,0 +1,12 @@
+<div class="input-group">
+    {% include widget.subwidgets.0.template_name with widget=widget.subwidgets.0 %}
+    {% include widget.subwidgets.1.template_name with widget=widget.subwidgets.1 %}
+</div>
+
+{% for error in widget.error_messages %}
+    <div class="invalid-feedback d-block">{{ error }}</div>
+{% endfor %}
+
+{% if field.help_text %}
+    <small class="form-text text-muted">{{ field.help_text|safe }}</small>
+{% endif %}
