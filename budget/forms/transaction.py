@@ -1,5 +1,4 @@
 from django import forms
-from django.forms import widgets
 
 from budget.forms.fields import AmountCurrencyField
 from budget.models import Transaction, Currency
@@ -12,9 +11,7 @@ class TransactionForm(BootstrapFormMixin, forms.ModelForm):
     class Meta:
         model = Transaction
         fields = ('account', 'category', 'amount_currency', 'account_amount', 'description', 'performed_date')
-        widgets = {
-            'performed_date': forms.DateInput(attrs={'type': 'date'},),
-        }
+        widgets = {'performed_date': forms.DateInput(attrs={'type': 'date'})}
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -31,15 +28,34 @@ class TransactionForm(BootstrapFormMixin, forms.ModelForm):
 
         amount_currency = cleaned_data.get("amount_currency")
         category = cleaned_data.get("category")
+        account = cleaned_data.get("account")
+        account_amount = cleaned_data.get("account_amount")
 
-        if not amount_currency or not category:
+        if not all([amount_currency, category, account]):
             return cleaned_data
 
         amount = amount_currency.get("amount")
+        currency = amount_currency.get("currency")
+
         if amount is None:
             return cleaned_data
 
-        amount_currency["amount"] = abs(amount) if category.is_income else -abs(amount)
+        normalized_amount = abs(amount) if category.is_income else -abs(amount)
+
+        cleaned_data["amount_currency"] = {
+            **amount_currency,
+            "amount": normalized_amount,
+        }
+
+        if currency == account.currency:
+            cleaned_data["account_amount"] = normalized_amount
+        else:
+            if account_amount is None:
+                self.add_error("account_amount", "Required for currency conversion")
+            else:
+                cleaned_data["account_amount"] = (
+                    abs(account_amount) if category.is_income else -abs(account_amount)
+                )
 
         return cleaned_data
 

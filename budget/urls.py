@@ -12,6 +12,8 @@ urlpatterns = [
     path('categories/<int:pk>/update/', views.CategoryUpdateView.as_view(), name="category_update"),
     path('categories/add/', views.CategoryCreateView.as_view(), name="category_add"),
     path('categories/<int:pk>/', views.CategoryDetailView.as_view(), name="category_detail"),
+    path('transactions/', views.TransactionListView.as_view(), name="transaction_list"),
     path('transactions/add/', views.TransactionCreateView.as_view(), name="transaction_add"),
     path('transactions/<int:pk>/update/', views.TransactionUpdateView.as_view(), name="transaction_update"),
+    path('transactions/<int:pk>/delete/', views.TransactionDeleteView.as_view(), name="transaction_delete"),
 ]

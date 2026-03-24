@@ -1,0 +1,71 @@
+{% extends 'index.html' %}
+
+
+{% block title %}🪙 2coins{% if title %} | {{ title }}{% else %}{% endif %}{% endblock %}
+
+{% block content %}
+    <div class="mb-4 bg-body-tertiary p-3 rounded border">
+        <form method="get" class="d-flex gap-3">
+            {% for field in filter.form %}
+                {{ field }}
+            {% endfor %}
+
+            <div id="btns" class="d-flex gap-2">
+                <button type="submit" class="btn btn-primary">Filter</button>
+                <a href="?" class="btn bg-body-tertiary">Clear</a>
+            </div>
+        </form>
+    </div>
+
+    <div class="d-flex flex-wrap justify-content-center gap-3">
+        <div class="col" style="min-width: 20rem; max-width: 30rem;">
+            <div class="card border-dark mb-3">
+                <h3 class="card-header">
+                    Transactions
+                </h3>
+
+                <div class="card-body p-0">
+                    <table class="table table-striped mb-0 align-middle" style="border: transparent; font-size: medium;">
+                        <tbody>
+                        {% for txn in filter.qs %}
+                            <tr>
+                                <td>{{ txn.performed_date|date:'d.m.Y' }}</td>
+                                <td class="text-center">
+                                    <h5 class="mb-0">
+                                        <span class="badge {{ txn.badge_color }}">{{ txn.account.name }}</span>
+                                    </h5>
+                                </td>
+                                <td class="text-center">
+                                    <h5 class="mb-0">
+                                        <span class="badge {{ txn.badge_color }}">{{ txn.category.name }}</span>
+                                    </h5>
+                                </td>
+                                <td class="text-end {% if txn.amount > 0 %}text-success{% else %}text-danger{% endif %} ">
+                                    <h5 class="mb-0">
+                                        {{ txn.amount }} {{ txn.currency.symbol }}
+                                    </h5>
+                                </td>
+                                <td class="text-center">
+                                    <a href="{% url 'transaction_update' txn.id %}">
+                                        <i class="bi bi-three-dots-vertical"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="col">
+            <div class="card border-dark" style="min-width: 30rem;">
+                <h3 class="card-header">
+                    Stats
+                </h3>
+
+                <div class="card-body"></div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

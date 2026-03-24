@@ -34,8 +34,11 @@ class BootstrapFormMixin:
             ),
         )
 
+    def get_form_fields(self):
+        return self.fields
+
     def _init_bootstrap(self):
-        for name, field in self.fields.items():
+        for name, field in self.get_form_fields().items():
             widget = field.widget
 
             if isinstance(widget, forms.MultiWidget):

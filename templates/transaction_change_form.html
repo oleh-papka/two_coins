@@ -13,13 +13,33 @@
     {% endif %}
 {% endblock %}
 
+{% block buttons_block %}
+    {% if object %}
+        <div class="d-flex flex-wrap justify-content-between gap-2 mt-4">
+            <a href="{% url 'transaction_delete' object.pk %}" class="btn btn-danger">Delete</a>
+
+            <div>
+                <button class="btn bg-body" style="min-width: 100px" type="button"
+                        onclick="window.history.back()">
+                    Back
+                </button>
+                <button class="btn btn-primary" style="min-width: 100px" type="submit">
+                    Save
+                </button>
+            </div>
+        </div>
+    {% else %}
+        {{ block.super }}
+    {% endif %}
+{% endblock %}
+
 
 {% block extra_js %}
     {{ block.super }}
 
     {{ account_currency_map|json_script:"account-currency-map" }}
     {{ currency_symbol_map|json_script:"currency-symbol-map" }}
-    
+
 
     <script>
         document.addEventListener("DOMContentLoaded", function () {

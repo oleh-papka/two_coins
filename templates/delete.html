@@ -1,0 +1,30 @@
+{% extends 'index.html' %}
+
+{% block title %}🪙 2coins{% if title %} | {{ title }}{% else %}{% endif %}{% endblock %}
+
+
+{% block content %}
+    <div class="d-flex justify-content-center align-items-center">
+        <div class="card col-12 col-md-6 col-sm-10 border-danger bg-body-tertiary">
+            <h3 class="card-header text-danger">Delete {{ object_repr }}</h3>
+
+            <div class="card-body p-3">
+                <form method="post">
+                    {% csrf_token %}
+
+                    {% block buttons_block %}
+                        <div class="d-flex flex-wrap justify-content-end gap-2">
+                            <button class="btn bg-body" style="min-width: 100px" type="button"
+                                    onclick="window.history.back()">
+                                Back
+                            </button>
+                            <button class="btn btn-danger" style="min-width: 100px" type="submit">
+                                Delete
+                            </button>
+                        </div>
+                    {% endblock %}
+                </form>
+            </div>
+        </div>
+    </div>
+{% endblock %}
