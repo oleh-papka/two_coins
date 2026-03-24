@@ -12,6 +12,7 @@ from budget.filters import TransactionFilter
 from budget.forms.account import AccountForm
 from budget.forms.category import CategoryForm
 from budget.forms.transaction import TransactionForm
+from budget.mixins.create import CreateMixin
 from budget.mixins.list import ListMixin
 from budget.models import Account, Category, Transaction, Currency
 from budget.services.account import AccountService
@@ -43,22 +44,9 @@ class AccountUpdateView(LoginRequiredMixin, UpdateView):
         return ctx
 
 
-class AccountCreateView(LoginRequiredMixin, CreateView):
-    login_url = 'login'
+class AccountCreateView(CreateMixin):
     model = Account
     form_class = AccountForm
-    template_name = 'change_form.html'
-
-    def get_context_data(self, **kwargs):
-        ctx = super().get_context_data(**kwargs)
-
-        ctx['title'] = f'Create {self.object}'
-        ctx['model_name'] = 'Account'
-        return ctx
-
-    def form_valid(self, form):
-        form.instance.user = self.request.user
-        return super().form_valid(form)
 
 
 class AccountDetailView(LoginRequiredMixin, DetailView):
@@ -133,22 +121,9 @@ class CategoryUpdateView(LoginRequiredMixin, UpdateView):
         return ctx
 
 
-class CategoryCreateView(LoginRequiredMixin, CreateView):
-    login_url = 'login'
+class CategoryCreateView(CreateMixin):
     model = Category
     form_class = CategoryForm
-    template_name = 'change_form.html'
-
-    def get_context_data(self, **kwargs):
-        ctx = super().get_context_data(**kwargs)
-
-        ctx['title'] = f'Create {self.object}'
-        ctx['model_name'] = 'Category'
-        return ctx
-
-    def form_valid(self, form):
-        form.instance.user = self.request.user
-        return super().form_valid(form)
 
     def get_form(self, form_class=None):
         form = super().get_form(form_class)
@@ -207,17 +182,13 @@ class CategoryDeleteView(LoginRequiredMixin, DeleteView):
         return HttpResponseRedirect(self.get_success_url())
 
 
-class TransactionCreateView(LoginRequiredMixin, CreateView):
-    login_url = 'login'
+class TransactionCreateView(CreateMixin):
     model = Transaction
     form_class = TransactionForm
     template_name = 'transaction_change_form.html'
 
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
-
-        ctx['title'] = f'Create {self.object}'
-        ctx['model_name'] = 'Transaction'
 
         ctx["account_currency_map"] = {
             str(account.id): str(account.currency_id)
