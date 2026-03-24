@@ -1,0 +1,62 @@
+{% extends 'index.html' %}
+
+{% block title %}🪙 2coins{% if title %} | {{ title }}{% else %}{% endif %}{% endblock %}
+
+
+{% block content %}
+    <div class="d-flex justify-content-center align-items-center">
+        <div class="card col-12 col-md-6 col-sm-10 bg-body-tertiary">
+            <h3 class="card-header">{% if form.instance.pk %}Edit {{ object }}{% else %}Add
+                {{ model_name }}{% endif %}</h3>
+
+            <div class="card-body p-4">
+                <form method="post">
+                    {% csrf_token %}
+
+                    {% if form.non_field_errors %}
+                        <div class="alert alert-dismissible alert-danger">
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                            {% for error in form.non_field_errors %}
+                                <div>{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+
+                    {% block form_cycle %}
+                        {% for field in form %}
+                            <div class="mb-3">
+                                <label for="{{ field.id_for_label }}" class="form-label">
+                                    <!-- @formatter:off -->
+                                {{ field.label }} {% if field.field.required %}<span class="text-danger">*</span>{% endif %}
+                                <!-- @formatter:on -->
+                                </label>
+                                {% block field_override %}
+                                    {{ field }}
+                                {% endblock %}
+                                {% for error in field.errors %}
+                                    <div class="invalid-feedback d-block">{{ error }}</div>
+                                {% endfor %}
+                                {% if field.help_text %}
+                                    <small class="form-text text-muted">{{ field.help_text|safe }}</small>
+                                {% endif %}
+                            </div>
+                        {% endfor %}
+                    {% endblock %}
+
+
+                    {% block buttons_block %}
+                        <div class="d-flex flex-wrap justify-content-end gap-2 mt-4">
+                            <button class="btn bg-body" style="min-width: 100px" type="button"
+                                    onclick="window.history.back()">
+                                Back
+                            </button>
+                            <button class="btn btn-primary" style="min-width: 100px" type="submit">
+                                Save
+                            </button>
+                        </div>
+                    {% endblock %}
+                </form>
+            </div>
+        </div>
+    </div>
+{% endblock %}

@@ -1,0 +1,89 @@
+{% extends 'index.html' %}
+
+{% block title %}🪙 2coins{% if title %} | {{ title }}{% else %}{% endif %}{% endblock %}
+
+{% block content %}
+    <div class="d-flex flex-wrap justify-content-center gap-3">
+        <div class="col" style="min-width: 20rem; max-width: 30rem;">
+            <div class="card border-dark mb-3">
+                <h3 class="card-header">
+                    {{ object.icon|default:'💳' }} {{ object.name }}
+                    ({% if object.category_type == '+' %}<span class="text-success">Income</span>
+                {% else %}<span class="text-danger">Expense</span>{% endif %})
+                </h3>
+
+                <div class="card-body">
+                    <div class="d-flex justify-content-between gap-2">
+                        <a href="{% url 'transaction_add' %}?category={{ object.pk }}" class="btn btn-primary">Add
+                            transaction</a>
+
+                        <div class="btn-group" role="group">
+                            <button class="btn" onclick="location.href = '{% url 'category_update' object.pk %}';">
+                                <i class="bi bi-gear"></i>
+                            </button>
+                            <button class="btn btn-danger">
+                                <i class="bi bi-trash3"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <ul class="list-group list-group-flush">
+                    {% if object.category_type == '+' %}
+                        <li class="list-group-item text-success d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0">Income:</h5>
+                            <h5 class="mb-0">{{ stats_total }}</h5>
+                        </li>
+                    {% else %}
+                        <li class="list-group-item text-danger d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0">Expenses:</h5>
+                            <h5 class="mb-0">{{ stats_total }}</h5>
+                        </li>
+                    {% endif %}
+                </ul>
+
+                <div class="card-footer text-muted text-center p-1">
+                    <small>
+                        As of {% now 'F Y' %}
+                    </small>
+                </div>
+            </div>
+
+            <div class="card overflow-hidden">
+                <h3 class="card-header">
+                    Transactions
+                </h3>
+
+                <div class="card-body p-0">
+                    <table class="table table-striped mb-0" style="border: transparent;">
+                        <tbody>
+                        {% for txn in transactions %}
+                            <tr>
+                                <td>{{ txn.date }}</td>
+                                <td class="text-center"><span
+                                        class="badge {{ txn.badge_color }}">{{ txn.account }}</span></td>
+                                <td class="text-end {% if txn.amount > 0 %}text-success{% else %}text-danger{% endif %} ">{{ txn.amount }} {{ txn.currency }}</td>
+                                <td class="text-center">
+                                    <a href="{% url 'transaction_update' txn.id %}">
+                                        <i class="bi bi-three-dots-vertical"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="col">
+            <div class="card border-dark" style="min-width: 30rem;">
+                <h3 class="card-header">
+                    Stats
+                </h3>
+
+                <div class="card-body"></div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
