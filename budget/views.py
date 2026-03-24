@@ -6,13 +6,14 @@ from django.db.models.functions import Coalesce
 from django.http import HttpResponseRedirect
 from django.urls import reverse_lazy
 from django.utils import timezone
-from django.views.generic import TemplateView, DetailView, DeleteView
+from django.views.generic import TemplateView, DetailView
 
 from budget.filters import TransactionFilter
 from budget.forms.account import AccountForm
 from budget.forms.category import CategoryForm
 from budget.forms.transaction import TransactionForm
 from budget.mixins.create import CreateMixin
+from budget.mixins.delete import DeleteMixin
 from budget.mixins.list import ListMixin
 from budget.mixins.update import UpdateMixin
 from budget.models import Account, Category, Transaction, Currency
@@ -78,22 +79,15 @@ class AccountDetailView(LoginRequiredMixin, DetailView):
         return ctx
 
 
-class AccountDeleteView(LoginRequiredMixin, DeleteView):
-    login_url = 'login'
+class AccountDeleteView(DeleteMixin):
     model = Account
-    template_name = 'delete.html'
     success_url = reverse_lazy('account_list')
+    model_service = AccountService
 
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
-        ctx['title'] = f'Delete {self.object}'
         ctx['object_repr'] = f'account {self.object.name} (this will delete all related transactions of that account)'
         return ctx
-
-    def form_valid(self, form):
-        AccountService.delete_account(self.object)
-
-        return HttpResponseRedirect(self.get_success_url())
 
 
 class CategoryListView(ListMixin):
@@ -149,22 +143,15 @@ class CategoryDetailView(LoginRequiredMixin, DetailView):
         return ctx
 
 
-class CategoryDeleteView(LoginRequiredMixin, DeleteView):
-    login_url = 'login'
+class CategoryDeleteView(DeleteMixin):
     model = Category
-    template_name = 'delete.html'
     success_url = reverse_lazy('category_list')
+    model_service = CategoryService
 
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
-        ctx['title'] = f'Delete {self.object}'
         ctx['object_repr'] = f'category {self.object.name} (this will delete all related transactions of that category)'
         return ctx
-
-    def form_valid(self, form):
-        CategoryService.delete_category(self.object)
-
-        return HttpResponseRedirect(self.get_success_url())
 
 
 class TransactionCreateView(CreateMixin):
@@ -254,21 +241,14 @@ class TransactionListView(ListMixin):
         return Transaction.objects.all().order_by('-performed_date')
 
 
-class TransactionDeleteView(LoginRequiredMixin, DeleteView):
-    login_url = 'login'
+class TransactionDeleteView(DeleteMixin):
     model = Transaction
-    template_name = 'delete.html'
     success_url = reverse_lazy('transaction_list')
+    model_service = TransactionService
 
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
-        ctx['title'] = f'Delete {self.object}'
         ctx['object_repr'] = (
             f'transaction of {self.object.account_amount}{self.object.currency.symbol} from {self.object.account.name}'
         )
         return ctx
-
-    def form_valid(self, form):
-        TransactionService.delete_transaction(self.object)
-
-        return HttpResponseRedirect(self.get_success_url())

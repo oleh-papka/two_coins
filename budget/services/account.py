@@ -8,7 +8,7 @@ class AccountService:
 
     @staticmethod
     @transaction.atomic
-    def delete_account(account: Account):
+    def delete(account: Account):
         txns = account.transaction_set.all()
 
         for txn in txns:
