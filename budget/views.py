@@ -6,13 +6,13 @@ from django.db.models.functions import Coalesce
 from django.http import HttpResponseRedirect
 from django.urls import reverse_lazy
 from django.utils import timezone
-from django.views.generic import ListView, TemplateView, UpdateView, CreateView, DetailView, DeleteView
-from django_filters.views import FilterView
+from django.views.generic import TemplateView, UpdateView, CreateView, DetailView, DeleteView
 
 from budget.filters import TransactionFilter
 from budget.forms.account import AccountForm
 from budget.forms.category import CategoryForm
 from budget.forms.transaction import TransactionForm
+from budget.mixins.list import ListMixin
 from budget.models import Account, Category, Transaction, Currency
 from budget.services.account import AccountService
 from budget.services.category import CategoryService
@@ -25,19 +25,9 @@ class DashboardView(LoginRequiredMixin, TemplateView):
     template_name = 'index.html'
 
 
-class AccountListView(LoginRequiredMixin, ListView):
-    login_url = 'login'
+class AccountListView(ListMixin):
     model = Account
     template_name = 'accounts_list.html'
-
-    def get_queryset(self):
-        return super().get_queryset().filter(user=self.request.user)
-
-    def get_context_data(self, **kwargs):
-        ctx = super().get_context_data(**kwargs)
-
-        ctx['title'] = 'Accounts'
-        return ctx
 
 
 class AccountUpdateView(LoginRequiredMixin, UpdateView):
@@ -125,19 +115,9 @@ class AccountDeleteView(LoginRequiredMixin, DeleteView):
         return HttpResponseRedirect(self.get_success_url())
 
 
-class CategoryListView(LoginRequiredMixin, ListView):
-    login_url = 'login'
+class CategoryListView(ListMixin):
     model = Category
     template_name = 'categories_list.html'
-
-    def get_queryset(self):
-        return super().get_queryset().filter(user=self.request.user)
-
-    def get_context_data(self, **kwargs):
-        ctx = super().get_context_data(**kwargs)
-
-        ctx['title'] = 'Categories'
-        return ctx
 
 
 class CategoryUpdateView(LoginRequiredMixin, UpdateView):
@@ -311,14 +291,13 @@ class TransactionUpdateView(LoginRequiredMixin, UpdateView):
         return form
 
 
-class TransactionListView(LoginRequiredMixin, FilterView):
-    login_url = 'login'
+class TransactionListView(ListMixin):
     model = Transaction
     template_name = 'transaction_list.html'
     filterset_class = TransactionFilter
 
     def get_queryset(self):
-        return super().get_queryset().order_by('-performed_date')
+        return Transaction.objects.all().order_by('-performed_date')
 
 
 class TransactionDeleteView(LoginRequiredMixin, DeleteView):
