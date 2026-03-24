@@ -6,7 +6,7 @@ from core.mixins.forms import BootstrapFormMixin
 
 
 class TransactionForm(BootstrapFormMixin, forms.ModelForm):
-    amount_currency = AmountCurrencyField(currency_queryset=Currency.objects.all(), label="Amount")
+    amount_currency = AmountCurrencyField(label="Amount")
 
     class Meta:
         model = Transaction
@@ -16,6 +16,11 @@ class TransactionForm(BootstrapFormMixin, forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self._init_bootstrap()
+
+        currencies = Currency.objects.all()
+        self.fields["amount_currency"].fields[1].queryset = currencies
+        currency_choices = [(obj.pk, f"{obj.symbol} ({obj.abbr})") for obj in currencies]
+        self.fields['amount_currency'].widget.widgets[1].choices = currency_choices
 
         if self.instance.pk:
             self.initial["amount_currency"] = {
