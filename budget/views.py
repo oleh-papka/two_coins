@@ -6,7 +6,7 @@ from django.db.models.functions import Coalesce
 from django.http import HttpResponseRedirect
 from django.urls import reverse_lazy
 from django.utils import timezone
-from django.views.generic import TemplateView, UpdateView, CreateView, DetailView, DeleteView
+from django.views.generic import TemplateView, DetailView, DeleteView
 
 from budget.filters import TransactionFilter
 from budget.forms.account import AccountForm
@@ -14,6 +14,7 @@ from budget.forms.category import CategoryForm
 from budget.forms.transaction import TransactionForm
 from budget.mixins.create import CreateMixin
 from budget.mixins.list import ListMixin
+from budget.mixins.update import UpdateMixin
 from budget.models import Account, Category, Transaction, Currency
 from budget.services.account import AccountService
 from budget.services.category import CategoryService
@@ -31,17 +32,9 @@ class AccountListView(ListMixin):
     template_name = 'accounts_list.html'
 
 
-class AccountUpdateView(LoginRequiredMixin, UpdateView):
-    login_url = 'login'
+class AccountUpdateView(UpdateMixin):
     model = Account
     form_class = AccountForm
-    template_name = 'change_form.html'
-
-    def get_context_data(self, **kwargs):
-        ctx = super().get_context_data(**kwargs)
-
-        ctx['title'] = f'Update {self.object}'
-        return ctx
 
 
 class AccountCreateView(CreateMixin):
@@ -108,17 +101,9 @@ class CategoryListView(ListMixin):
     template_name = 'categories_list.html'
 
 
-class CategoryUpdateView(LoginRequiredMixin, UpdateView):
-    login_url = 'login'
+class CategoryUpdateView(UpdateMixin):
     model = Category
     form_class = CategoryForm
-    template_name = 'change_form.html'
-
-    def get_context_data(self, **kwargs):
-        ctx = super().get_context_data(**kwargs)
-
-        ctx['title'] = f'Update {self.object}'
-        return ctx
 
 
 class CategoryCreateView(CreateMixin):
@@ -220,8 +205,7 @@ class TransactionCreateView(CreateMixin):
         return form
 
 
-class TransactionUpdateView(LoginRequiredMixin, UpdateView):
-    login_url = 'login'
+class TransactionUpdateView(UpdateMixin):
     model = Transaction
     form_class = TransactionForm
     template_name = 'transaction_change_form.html'
@@ -229,7 +213,6 @@ class TransactionUpdateView(LoginRequiredMixin, UpdateView):
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
 
-        ctx['title'] = f'Update {self.object}'
         ctx['model_name'] = 'Transaction'
 
         ctx["account_currency_map"] = {
