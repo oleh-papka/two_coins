@@ -14,6 +14,8 @@ from budget.forms.account import AccountForm
 from budget.forms.category import CategoryForm
 from budget.forms.transaction import TransactionForm
 from budget.models import Account, Category, Transaction, Currency
+from budget.services.account import AccountService
+from budget.services.category import CategoryService
 from budget.services.styling import StylingService
 from budget.services.transaction import TransactionService
 
@@ -105,6 +107,24 @@ class AccountDetailView(LoginRequiredMixin, DetailView):
         return ctx
 
 
+class AccountDeleteView(LoginRequiredMixin, DeleteView):
+    login_url = 'login'
+    model = Account
+    template_name = 'delete.html'
+    success_url = reverse_lazy('account_list')
+
+    def get_context_data(self, **kwargs):
+        ctx = super().get_context_data(**kwargs)
+        ctx['title'] = f'Delete {self.object}'
+        ctx['object_repr'] = f'account {self.object.name} (this will delete all related transactions of that account)'
+        return ctx
+
+    def form_valid(self, form):
+        AccountService.delete_account(self.object)
+
+        return HttpResponseRedirect(self.get_success_url())
+
+
 class CategoryListView(LoginRequiredMixin, ListView):
     login_url = 'login'
     model = Category
@@ -187,6 +207,24 @@ class CategoryDetailView(LoginRequiredMixin, DetailView):
         ctx['stats_total'] = transactions.aggregate(total=Coalesce(Sum("amount"), Decimal("0")))['total']
 
         return ctx
+
+
+class CategoryDeleteView(LoginRequiredMixin, DeleteView):
+    login_url = 'login'
+    model = Category
+    template_name = 'delete.html'
+    success_url = reverse_lazy('category_list')
+
+    def get_context_data(self, **kwargs):
+        ctx = super().get_context_data(**kwargs)
+        ctx['title'] = f'Delete {self.object}'
+        ctx['object_repr'] = f'category {self.object.name} (this will delete all related transactions of that category)'
+        return ctx
+
+    def form_valid(self, form):
+        CategoryService.delete_category(self.object)
+
+        return HttpResponseRedirect(self.get_success_url())
 
 
 class TransactionCreateView(LoginRequiredMixin, CreateView):
@@ -292,7 +330,9 @@ class TransactionDeleteView(LoginRequiredMixin, DeleteView):
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
         ctx['title'] = f'Delete {self.object}'
-        ctx['object_repr'] = f'transaction of {self.object.account_amount}{self.object.currency.symbol} from {self.object.account.name}'
+        ctx['object_repr'] = (
+            f'transaction of {self.object.account_amount}{self.object.currency.symbol} from {self.object.account.name}'
+        )
         return ctx
 
     def form_valid(self, form):
