@@ -11,8 +11,9 @@ class CreateMixin(LoginRequiredMixin, CreateView):
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
 
-        ctx['title'] = f'Create {self.object}'
-        ctx['model_name'] = self.object._meta.model_name
+        model_name = self.model.__name__
+        ctx['title'] = f'Create {model_name}'
+        ctx['model_name'] = model_name
         return ctx
 
     def form_valid(self, form):

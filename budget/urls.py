@@ -1,21 +1,25 @@
 from django.urls import path
 
-from . import views
+from .views.account import AccountListView, AccountUpdateView, AccountDeleteView, AccountDetailView, AccountCreateView
+from .views.category import CategoryListView, CategoryUpdateView, CategoryDeleteView, CategoryCreateView, \
+    CategoryDetailView
+from .views.dashboard import DashboardView
+from .views.transaction import TransactionListView, TransactionCreateView, TransactionUpdateView, TransactionDeleteView
 
 urlpatterns = [
-    path('', views.DashboardView.as_view(), name="dashboard"),
-    path('accounts/', views.AccountListView.as_view(), name="account_list"),
-    path('accounts/<int:pk>/update/', views.AccountUpdateView.as_view(), name="account_update"),
-    path('accounts/<int:pk>/delete/', views.AccountDeleteView.as_view(), name="account_delete"),
-    path('accounts/<int:pk>/', views.AccountDetailView.as_view(), name="account_detail"),
-    path('accounts/add/', views.AccountCreateView.as_view(), name="account_add"),
-    path('categories/', views.CategoryListView.as_view(), name="category_list"),
-    path('categories/<int:pk>/update/', views.CategoryUpdateView.as_view(), name="category_update"),
-    path('categories/<int:pk>/delete/', views.CategoryDeleteView.as_view(), name="category_delete"),
-    path('categories/add/', views.CategoryCreateView.as_view(), name="category_add"),
-    path('categories/<int:pk>/', views.CategoryDetailView.as_view(), name="category_detail"),
-    path('transactions/', views.TransactionListView.as_view(), name="transaction_list"),
-    path('transactions/add/', views.TransactionCreateView.as_view(), name="transaction_add"),
-    path('transactions/<int:pk>/update/', views.TransactionUpdateView.as_view(), name="transaction_update"),
-    path('transactions/<int:pk>/delete/', views.TransactionDeleteView.as_view(), name="transaction_delete"),
+    path('', DashboardView.as_view(), name="dashboard"),
+    path('accounts/', AccountListView.as_view(), name="account_list"),
+    path('accounts/<int:pk>/update/', AccountUpdateView.as_view(), name="account_update"),
+    path('accounts/<int:pk>/delete/', AccountDeleteView.as_view(), name="account_delete"),
+    path('accounts/<int:pk>/', AccountDetailView.as_view(), name="account_detail"),
+    path('accounts/add/', AccountCreateView.as_view(), name="account_add"),
+    path('categories/', CategoryListView.as_view(), name="category_list"),
+    path('categories/<int:pk>/update/', CategoryUpdateView.as_view(), name="category_update"),
+    path('categories/<int:pk>/delete/', CategoryDeleteView.as_view(), name="category_delete"),
+    path('categories/add/', CategoryCreateView.as_view(), name="category_add"),
+    path('categories/<int:pk>/', CategoryDetailView.as_view(), name="category_detail"),
+    path('transactions/', TransactionListView.as_view(), name="transaction_list"),
+    path('transactions/add/', TransactionCreateView.as_view(), name="transaction_add"),
+    path('transactions/<int:pk>/update/', TransactionUpdateView.as_view(), name="transaction_update"),
+    path('transactions/<int:pk>/delete/', TransactionDeleteView.as_view(), name="transaction_delete"),
 ]
