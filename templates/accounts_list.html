@@ -21,7 +21,7 @@
         {% for object in object_list %}
             <div class="card border-dark" style="max-width: 25rem; min-width: 18rem">
 
-                <h3 class="card-header ">{{ object.icon|default:'💳' }} {{ object.name }}</h3>
+                <h3 class="card-header {{ object.color }} bg-opacity-75">{{ object.icon|default:'💳' }} {{ object.name }}</h3>
 
                 <div class="card-body">
                     <h2 class="card-title">{{ object.currency.symbol }} {{ object.balance }} </h2>

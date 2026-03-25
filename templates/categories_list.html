@@ -33,7 +33,7 @@
                     {% if object.category_type == '-' %}
                         <div class="card border-danger" style="max-width: 280px; min-width: 220px">
 
-                            <h3 class="card-header">{{ object.icon|default:'💳' }} {{ object.name }}</h3>
+                            <h3 class="card-header {{ object.color }} bg-opacity-75">{{ object.icon|default:'💳' }} {{ object.name }}</h3>
 
                             <div class="card-body">
                                 <div class="d-flex gap-2 position-relative" style="z-index: 2;">
