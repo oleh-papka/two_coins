@@ -79,6 +79,10 @@
                                     </a>
                                 </td>
                             </tr>
+                        {% empty %}
+                            <tr>
+                                <td class="text-muted text-center">No data</td>
+                            </tr>
                         {% endfor %}
                         </tbody>
                     </table>
