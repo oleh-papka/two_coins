@@ -6,7 +6,7 @@
     <div class="d-flex flex-wrap justify-content-center gap-3">
         <div class="col" style="min-width: 20rem; max-width: 30rem;">
             <div class="card border-dark mb-3">
-                <h3 class="card-header">
+                <h3 class="card-header {{ object.color }} bg-opacity-75">
                     {{ object.icon|default:'💳' }} {{ object.name }}
                 </h3>
 
@@ -78,6 +78,10 @@
                                         <i class="bi bi-three-dots-vertical"></i>
                                     </a>
                                 </td>
+                            </tr>
+                        {% empty %}
+                            <tr>
+                                <td class="text-muted text-center">No data</td>
                             </tr>
                         {% endfor %}
                         </tbody>

@@ -7,7 +7,7 @@ from core.mixins.forms import BootstrapFormMixin
 class AccountForm(BootstrapFormMixin, forms.ModelForm):
     class Meta:
         model = Account
-        fields = ('name', 'balance', 'currency', 'description', 'icon')
+        fields = ('name', 'balance', 'currency', 'description', 'icon', 'color')
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

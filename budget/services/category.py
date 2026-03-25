@@ -8,7 +8,7 @@ class CategoryService:
 
     @staticmethod
     @transaction.atomic
-    def delete_category(category: Category):
+    def delete(category: Category):
         txns = category.transaction_set.all()
 
         for txn in txns:

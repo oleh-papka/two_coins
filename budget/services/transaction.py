@@ -43,7 +43,7 @@ class TransactionService:
 
     @staticmethod
     @transaction.atomic
-    def delete_transaction(txn: Transaction):
+    def delete(txn: Transaction):
         txn = Transaction.objects.select_related("account").select_for_update().get(pk=txn.pk)
 
         account = txn.account

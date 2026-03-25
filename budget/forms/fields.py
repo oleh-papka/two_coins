@@ -1,3 +1,5 @@
+from decimal import Decimal
+
 from django import forms
 
 from .widgets import AmountCurrencyWidget
@@ -7,7 +9,7 @@ from ..models import Currency
 class AmountCurrencyField(forms.MultiValueField):
     def __init__(self, **kwargs):
         fields = (
-            forms.DecimalField(required=True),
+            forms.DecimalField(required=True, decimal_places=2, max_digits=10, initial=Decimal("0")),
             forms.ModelChoiceField(queryset=Currency.objects.none(), required=True),
         )
 

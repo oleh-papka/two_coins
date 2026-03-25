@@ -1,3 +1,5 @@
+from decimal import Decimal
+
 from django import forms
 
 
@@ -16,6 +18,7 @@ class AmountCurrencyWidget(forms.MultiWidget):
         widgets = [
             forms.NumberInput(attrs={
                 "step": "0.01",
+                "value": Decimal("0"),
                 "placeholder": "Amount",
             }),
             forms.Select(
