@@ -1,3 +1,5 @@
+from decimal import Decimal
+
 from django import forms
 
 from budget.forms.fields import AmountCurrencyField
