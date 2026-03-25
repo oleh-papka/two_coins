@@ -14,7 +14,6 @@ from budget.mixins.list import ListMixin
 from budget.mixins.update import UpdateMixin
 from budget.models import Category, Transaction
 from budget.services.category import CategoryService
-from budget.services.styling import StylingService
 
 
 class CategoryDetailView(LoginRequiredMixin, DetailView):
@@ -35,7 +34,7 @@ class CategoryDetailView(LoginRequiredMixin, DetailView):
             txns.append({
                 'id': transaction.id,
                 'account': transaction.account.name,
-                'badge_color': StylingService.get_badge_bootstrap_color(transaction.account.color),
+                'badge_color': transaction.account.color,
                 'date': transaction.performed_date.strftime('%d.%m.%Y'),
                 'amount': transaction.amount,
                 'currency': transaction.currency.symbol,

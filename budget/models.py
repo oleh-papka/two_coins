@@ -156,6 +156,10 @@ class Transaction(TimeStampMixin):
                                    max_length=50,
                                    verbose_name="Description")
     performed_date = models.DateField(default=timezone.localdate, verbose_name="Date")
+    user = models.ForeignKey('users.User',
+                             null=False,
+                             blank=False,
+                             on_delete=models.CASCADE)
 
     class Meta:
         verbose_name = "Transaction"

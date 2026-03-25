@@ -14,7 +14,7 @@ from budget.models import Account, Category, Transaction, Currency
 from budget.services.transaction import TransactionService
 
 
-class TransactionListView(FilterView, ListMixin ):
+class TransactionListView(FilterView, ListMixin):
     model = Transaction
     template_name = 'transaction_list.html'
     filterset_class = TransactionFilter
@@ -45,6 +45,7 @@ class TransactionCreateView(CreateMixin):
         return ctx
 
     def form_valid(self, form):
+        form.instance.user = self.request.user
         self.object = TransactionService.create_transaction(form)
         return HttpResponseRedirect(self.get_success_url())
 
