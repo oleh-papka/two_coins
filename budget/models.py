@@ -48,6 +48,10 @@ class Account(TimeStampMixin, StyleMixin):
                                    blank=True,
                                    max_length=50,
                                    verbose_name="Description")
+    allow_negative = models.BooleanField(default=False,
+                                         null=False,
+                                         blank=False,
+                                         verbose_name="Allow negative")
 
     class Meta:
         verbose_name = "Account"
@@ -55,25 +59,6 @@ class Account(TimeStampMixin, StyleMixin):
 
     def __str__(self):
         return f"{self.name} account"
-
-    def withdraw(self, amount: Decimal):
-        amount = abs(amount)
-
-        with db_transaction.atomic():
-            account = Account.objects.select_for_update().get(pk=self.pk)
-
-            if account.balance < amount:
-                raise ValidationError("Insufficient funds")
-
-            account.balance = F("balance") - amount
-            account.save(update_fields=["balance"])
-            account.refresh_from_db(fields=["balance"])
-            self.balance = account.balance
-
-    def deposit(self, amount: Decimal):
-        amount = abs(amount)
-        Account.objects.filter(pk=self.pk).update(balance=F("balance") + amount)
-        self.refresh_from_db(fields=["balance"])
 
     def get_absolute_url(self):
         return reverse('account_detail', kwargs={'pk': self.pk})

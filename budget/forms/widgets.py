@@ -11,6 +11,10 @@ def add_css_class(existing: str | None, new_class: str) -> str:
     return " ".join(classes).strip()
 
 
+class CheckboxWidget(forms.CheckboxInput):
+    template_name = "widgets/checkbox.html"
+
+
 class AmountCurrencyWidget(forms.MultiWidget):
     template_name = "widgets/amount_currency.html"
 
