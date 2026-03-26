@@ -1,8 +1,10 @@
-{% extends 'base.html' %}
+{% extends 'users/_base.html' %}
 
 {% block title %}🪙 2coins | Login{% endblock %}
 
 {% block body %}
+    {{ block.super }}
+
     <div id="login-wrapper" class="d-flex justify-content-center align-items-center vh-100">
         <div class="card col-3" style="max-width: 600px; min-width: 400px; margin: 0 auto;">
             <div class="card-body p-4">

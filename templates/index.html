@@ -57,8 +57,9 @@
                         <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="theme-menu"
                            aria-expanded="false" data-bs-toggle="dropdown" data-bs-display="static"
                            aria-label="Toggle theme">
-                            <i class="bi bi-circle-half"></i>
+                            <i id="theme-icon" class="bi bi-circle-half"></i>
                         </a>
+
                         <ul class="dropdown-menu dropdown-menu-end">
                             <li>
                                 <button type="button" class="dropdown-item d-flex align-items-center"
@@ -68,8 +69,14 @@
                             </li>
                             <li>
                                 <button type="button" class="dropdown-item d-flex align-items-center"
-                                        data-bs-theme-value="dark" aria-pressed="true">
+                                        data-bs-theme-value="dark" aria-pressed="false">
                                     <i class="bi bi-moon-stars-fill"></i><span class="ms-2">Dark</span>
+                                </button>
+                            </li>
+                            <li>
+                                <button type="button" class="dropdown-item d-flex align-items-center"
+                                        data-bs-theme-value="auto" aria-pressed="false">
+                                    <i class="bi bi-circle-half"></i><span class="ms-2">Auto</span>
                                 </button>
                             </li>
                         </ul>
@@ -150,53 +157,6 @@
 
 {% block extra_js %}
     {{ block.super }}
-
-    <script>
-        (() => {
-            const getStoredTheme = () => localStorage.getItem('theme')
-            const setStoredTheme = theme => localStorage.setItem('theme', theme)
-
-            const getPreferredTheme = () => {
-                const storedTheme = getStoredTheme()
-                if (storedTheme) {
-                    return storedTheme
-                }
-                return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
-            }
-
-            const setTheme = theme => {
-                document.documentElement.setAttribute('data-bs-theme', theme)
-            }
-
-            const updateActiveThemeButton = theme => {
-                const themeButtons = document.querySelectorAll('[data-bs-theme-value]')
-                themeButtons.forEach(btn => {
-                    const isActive = btn.getAttribute('data-bs-theme-value') === theme
-                    btn.setAttribute('aria-pressed', isActive ? 'true' : 'false')
-                    btn.classList.toggle('active', isActive)
-                })
-            }
-
-            const initTheme = () => {
-                const theme = getPreferredTheme()
-                setTheme(theme)
-                updateActiveThemeButton(theme)
-            }
-
-            document.addEventListener('DOMContentLoaded', () => {
-                initTheme()
-
-                document.querySelectorAll('[data-bs-theme-value]').forEach(button => {
-                    button.addEventListener('click', () => {
-                        const theme = button.getAttribute('data-bs-theme-value')
-                        setStoredTheme(theme)
-                        setTheme(theme)
-                        updateActiveThemeButton(theme)
-                    })
-                })
-            })
-        })()
-    </script>
 
     <script>
         document.addEventListener('DOMContentLoaded', function () {
