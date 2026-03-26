@@ -43,7 +43,7 @@
                                 </td>
                                 <td class="text-end {% if txn.amount > 0 %}text-success{% else %}text-danger{% endif %} ">
                                     <h5 class="mb-0">
-                                        {{ txn.amount }} {{ txn.currency.symbol }}
+                                        {{ txn.amount|floatformat }} {{ txn.currency.symbol }}
                                     </h5>
                                 </td>
                                 <td class="text-center">
