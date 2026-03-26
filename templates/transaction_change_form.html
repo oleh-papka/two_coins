@@ -3,10 +3,12 @@
 {% block field_override %}
     {% if field.name == 'account_amount' %}
         <div class="input-group">
+            <span class="input-group-text" id="id_account_amount_category_symbol"></span>
             <input type="number" name="account_amount" step="0.01"
                    class="form-control {% if field.errors %}is-invalid{% endif %}"
-                   placeholder="Amount in account's currency" id="id_account_amount">
-            <span class="input-group-text" id="account-amount-symbol">$</span>
+                   placeholder="Amount in account's currency" id="id_account_amount"
+                   value="{% if field.value %}{{ field.value }}{% endif %} ">
+            <span class="input-group-text" id="account-amount-symbol"></span>
         </div>
     {% else %}
         {{ field }}
@@ -39,6 +41,7 @@
 
     {{ account_currency_map|json_script:"account-currency-map" }}
     {{ currency_symbol_map|json_script:"currency-symbol-map" }}
+    {{ category_symbol_map|json_script:"category-symbol-map" }}
 
 
     <script>
@@ -49,6 +52,9 @@
             const currencySymbolMap = JSON.parse(
                 document.getElementById("currency-symbol-map").textContent
             );
+            const categorySymbolMap = JSON.parse(
+                document.getElementById("category-symbol-map").textContent
+            );
 
             const accountSelect = document.getElementById("id_account");
             const amountCurrencySelect = document.getElementById("id_amount_currency_1");
@@ -56,6 +62,11 @@
             const accountAmountRow = accountAmountInput.closest(".mb-3");
             const accountAmountSymbol = document.getElementById("account-amount-symbol");
             const accountAmountLabel = accountAmountRow.querySelector("label");
+
+
+            const categorySelect = document.getElementById("id_category");
+            const accountAmountCategorySymbol1 = document.getElementById("id_categorySymbol");
+            const accountAmountCategorySymbol2 = document.getElementById("id_account_amount_category_symbol");
 
             let requiredAsterisk = null;
 
@@ -74,6 +85,21 @@
             function getAccountCurrencyId() {
                 const accountId = accountSelect.value;
                 return accountCurrencyMap[String(accountId)] || null;
+            }
+
+            function getCategorySymbol() {
+                const categoryId = categorySelect?.value;
+                return categorySymbolMap[String(categoryId)] || "";
+            }
+
+            function updateCurrencySymbols() {
+                const symbol = getCategorySymbol() || "";
+                if (accountAmountCategorySymbol1) {
+                    accountAmountCategorySymbol1.textContent = symbol;
+                }
+                if (accountAmountCategorySymbol2) {
+                    accountAmountCategorySymbol2.textContent = symbol;
+                }
             }
 
             function getSelectedAmountCurrencyId() {
@@ -117,6 +143,11 @@
 
             amountCurrencySelect.addEventListener("change", updateAccountAmountVisibility);
             accountSelect.addEventListener("change", updateAccountAmountVisibility);
+
+
+            categorySelect.addEventListener("change", updateCurrencySymbols);
+
+            updateCurrencySymbols();
         });
     </script>
 {% endblock %}

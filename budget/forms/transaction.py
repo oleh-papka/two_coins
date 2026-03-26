@@ -5,6 +5,7 @@ from django import forms
 from budget.forms.fields import AmountCurrencyField
 from budget.models import Transaction, Currency
 from core.mixins.forms import BootstrapFormMixin
+from core.services.decimal import format_decimal_for_input
 
 
 class TransactionForm(BootstrapFormMixin, forms.ModelForm):
@@ -24,9 +25,9 @@ class TransactionForm(BootstrapFormMixin, forms.ModelForm):
         currency_choices = [(obj.pk, f"{obj.symbol} ({obj.abbr})") for obj in currencies]
         self.fields['amount_currency'].widget.widgets[1].choices = currency_choices
 
-        if self.instance.pk:
+        if self.instance and self.instance.pk:
             self.initial["amount_currency"] = {
-                "amount": self.instance.amount,
+                "amount": format_decimal_for_input(self.instance.amount),
                 "currency": self.instance.currency_id,
             }
 

@@ -30,7 +30,6 @@ class Account(TimeStampMixin, StyleMixin):
                             verbose_name="Name")
     balance = models.DecimalField(null=False,
                                   blank=False,
-                                  default=Decimal("0"),
                                   max_digits=10,
                                   decimal_places=2,
                                   verbose_name="Balance")
@@ -136,13 +135,11 @@ class Transaction(TimeStampMixin):
                                  related_name="+")
     amount = models.DecimalField(null=False,
                                  blank=False,
-                                 default=Decimal("0"),
                                  max_digits=10,
                                  decimal_places=2,
                                  verbose_name="Amount")
-    account_amount = models.DecimalField(null=True,
-                                         blank=True,
-                                         default=None,
+    account_amount = models.DecimalField(null=False,
+                                         blank=False,
                                          max_digits=10,
                                          decimal_places=2,
                                          verbose_name="Amount in account's currency")

@@ -11,7 +11,7 @@
                 </h3>
 
                 <div class="card-body">
-                    <h2 class="card-title">{{ object.currency.symbol }} {{ object.balance }} </h2>
+                    <h2 class="card-title">{{ object.currency.symbol }} {{ object.balance|floatformat }} </h2>
                     <h6 class="card-subtitle mb-3 text-muted">{{ object.description|default:'&nbsp;' }}</h6>
 
                     <div class="d-flex justify-content-between gap-2">
@@ -70,7 +70,7 @@
                                 </td>
                                 <td class="text-end {% if txn.amount > 0 %}text-success{% else %}text-danger{% endif %} ">
                                     <h5 class="mb-0">
-                                        {{ txn.amount }} {{ txn.currency }}
+                                        {{ txn.amount|floatformat }} {{ txn.currency }}
                                     </h5>
                                 </td>
                                 <td class="text-center">

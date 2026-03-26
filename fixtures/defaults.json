@@ -1,0 +1,37 @@
+[
+  {
+    "model": "budget.account",
+    "pk": 1,
+    "fields": {
+      "color": "bg-body",
+      "icon": "💳",
+      "name": "Default",
+      "balance": "0.00",
+      "user": 1,
+      "currency": 1,
+      "description": null
+    }
+  },
+  {
+    "model": "budget.category",
+    "pk": 1,
+    "fields": {
+      "color": "bg-danger-subtle",
+      "icon": "⚪",
+      "name": "Other (exp)",
+      "category_type": "-",
+      "user": 1
+    }
+  },
+  {
+    "model": "budget.category",
+    "pk": 2,
+    "fields": {
+      "color": "bg-primary-subtle",
+      "icon": "⚪",
+      "name": "Other (inc)",
+      "category_type": "+",
+      "user": 1
+    }
+  }
+]

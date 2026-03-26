@@ -39,6 +39,10 @@ class TransactionCreateView(CreateMixin):
             for currency in Currency.objects.all()
         }
 
+        ctx["category_symbol_map"] = {
+            str(category.id): '-' if category.is_expense else '+' for category in Category.objects.all()
+        }
+
         if len(accounts) == 1:
             self.initial["account"] = accounts[0]
 
@@ -46,7 +50,7 @@ class TransactionCreateView(CreateMixin):
 
     def form_valid(self, form):
         form.instance.user = self.request.user
-        self.object = TransactionService.create_transaction(form)
+        self.object = TransactionService.create(form)
         return HttpResponseRedirect(self.get_success_url())
 
     def get_form(self, form_class=None):
@@ -59,8 +63,6 @@ class TransactionCreateView(CreateMixin):
 
         if account:
             form.fields["account"].initial = Account.objects.get(id=account)
-
-        form.fields['amount_currency'].fields[0].initial = Decimal("0")
 
         return form
 
@@ -88,7 +90,7 @@ class TransactionUpdateView(UpdateMixin):
         return ctx
 
     def form_valid(self, form):
-        self.object = TransactionService.update_transaction(form)
+        self.object = TransactionService.update(form)
         return HttpResponseRedirect(self.get_success_url())
 
     def get_form(self, form_class=None):

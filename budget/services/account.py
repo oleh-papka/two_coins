@@ -12,6 +12,6 @@ class AccountService:
         txns = account.transaction_set.all()
 
         for txn in txns:
-            TransactionService.delete_transaction(txn)
+            TransactionService.delete(txn)
 
         account.delete()

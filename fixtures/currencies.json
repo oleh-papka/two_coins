@@ -1,0 +1,38 @@
+[
+  {
+    "model": "budget.currency",
+    "pk": 1,
+    "fields": {
+      "name": "US Dollar",
+      "symbol": "$",
+      "abbr": "USD"
+    }
+  },
+  {
+    "model": "budget.currency",
+    "pk": 2,
+    "fields": {
+      "name": "Euro",
+      "symbol": "€",
+      "abbr": "EUR"
+    }
+  },
+  {
+    "model": "budget.currency",
+    "pk": 3,
+    "fields": {
+      "name": "Złoty",
+      "symbol": "zł",
+      "abbr": "PLN"
+    }
+  },
+  {
+    "model": "budget.currency",
+    "pk": 4,
+    "fields": {
+      "name": "Ukrainian hryvnia",
+      "symbol": "₴",
+      "abbr": "UAH"
+    }
+  }
+]

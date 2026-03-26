@@ -8,19 +8,18 @@ class TransactionService:
 
     @staticmethod
     @transaction.atomic
-    def create_transaction(form: TransactionForm):
+    def create(form: TransactionForm) -> Transaction:
         txn: Transaction = form.save()
 
         account = txn.account
         account.balance += txn.account_amount
-
         account.save(update_fields=["balance"])
 
         return txn
 
     @staticmethod
     @transaction.atomic
-    def update_transaction(form: TransactionForm):
+    def update(form: TransactionForm):
         if not form.instance.pk:
             raise ValueError("Transaction must exist for update")
 
