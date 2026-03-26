@@ -17,7 +17,8 @@ class CreateMixin(LoginRequiredMixin, CreateView):
         return ctx
 
     def form_valid(self, form):
-        form.instance.user = self.request.user
+        if hasattr(self.model, 'user'):
+            form.instance.user = self.request.user
         return super().form_valid(form)
 
     class Meta:

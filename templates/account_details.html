@@ -15,9 +15,12 @@
                     <h6 class="card-subtitle mb-3 text-muted">{{ object.description|default:'&nbsp;' }}</h6>
 
                     <div class="d-flex justify-content-between gap-2">
-                        <a href="{% url 'transaction_add' %}?account={{ object.pk }}" class="btn btn-primary">Add
-                            transaction</a>
+                        <div class="d-flex gap-2">
+                            <a href="{% url 'transaction_add' %}?account={{ object.pk }}" class="btn btn-primary">Add
+                                transaction</a>
 
+                            <a href="{% url 'transfer_add' %}?account_from={{ object.pk }}" class="btn">Transfer</a>
+                        </div>
                         <div class="btn-group" role="group">
                             <button class="btn" onclick="location.href = '{% url 'account_update' object.pk %}';">
                                 <i class="bi bi-gear"></i>
@@ -52,13 +55,13 @@
                 </div>
             </div>
 
-            <div class="card overflow-hidden">
+            <div class="card mb-3">
                 <h3 class="card-header">
                     Transactions
                 </h3>
 
-                <div class="card-body p-0">
-                    <table class="table table-striped mb-0" style="border: transparent; font-size: medium;">
+                <div class="card-body p-0" style="max-height: 400px; overflow-y: scroll;">
+                    <table class="table table-striped mb-0 align-middle" style="border: transparent; font-size: medium;">
                         <tbody>
                         {% for txn in transactions %}
                             <tr>
@@ -74,7 +77,7 @@
                                     </h5>
                                 </td>
                                 <td class="text-center">
-                                    <a href="{% url 'transaction_update' txn.id %}">
+                                    <a href="{{ txn.url }}">
                                         <i class="bi bi-three-dots-vertical"></i>
                                     </a>
                                 </td>

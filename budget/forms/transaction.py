@@ -1,5 +1,3 @@
-from decimal import Decimal
-
 from django import forms
 
 from budget.forms.fields import AmountCurrencyField
@@ -10,6 +8,10 @@ from core.services.decimal import format_decimal_for_input
 
 class TransactionForm(BootstrapFormMixin, forms.ModelForm):
     amount_currency = AmountCurrencyField(label="Amount")
+    account_amount = forms.DecimalField(required=False,
+                                        decimal_places=2,
+                                        max_digits=10,
+                                        label="Amount in account's currency")
 
     class Meta:
         model = Transaction
@@ -27,9 +29,10 @@ class TransactionForm(BootstrapFormMixin, forms.ModelForm):
 
         if self.instance and self.instance.pk:
             self.initial["amount_currency"] = {
-                "amount": format_decimal_for_input(self.instance.amount),
+                "amount": format_decimal_for_input(abs(self.instance.amount)),
                 "currency": self.instance.currency_id,
             }
+            self.initial["account_amount"] = format_decimal_for_input(abs(self.instance.account_amount))
 
     def clean(self):
         cleaned_data = super().clean()

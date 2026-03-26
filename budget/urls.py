@@ -5,6 +5,7 @@ from .views.category import CategoryListView, CategoryUpdateView, CategoryDelete
     CategoryDetailView
 from .views.dashboard import DashboardView
 from .views.transaction import TransactionListView, TransactionCreateView, TransactionUpdateView, TransactionDeleteView
+from .views.transfer import TransferAddView, TransferUpdateView, TransferDeleteView
 
 urlpatterns = [
     path('', DashboardView.as_view(), name="dashboard"),
@@ -22,4 +23,8 @@ urlpatterns = [
     path('transactions/add/', TransactionCreateView.as_view(), name="transaction_add"),
     path('transactions/<int:pk>/update/', TransactionUpdateView.as_view(), name="transaction_update"),
     path('transactions/<int:pk>/delete/', TransactionDeleteView.as_view(), name="transaction_delete"),
+
+    path('transfer/add/', TransferAddView.as_view(), name="transfer_add"),
+    path('transfer/<int:pk>/update/', TransferUpdateView.as_view(), name="transfer_update"),
+    path('transfer/<int:pk>/delete/', TransferDeleteView.as_view(), name="transfer_delete"),
 ]

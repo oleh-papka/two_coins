@@ -3,7 +3,8 @@ from decimal import Decimal
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.db import transaction as db_transaction
-from django.db.models import F
+from django.db.models import F, Q
+from django.db.models.constraints import CheckConstraint, UniqueConstraint
 from django.urls import reverse
 from django.utils import timezone
 
@@ -78,6 +79,27 @@ class Account(TimeStampMixin, StyleMixin):
         return reverse('account_detail', kwargs={'pk': self.pk})
 
 
+class SystemReservedQuerySet(models.QuerySet):
+    def delete(self):
+        reserved_objects = self.filter(is_system_reserved=True)
+
+        if reserved_objects.exists():
+            reserved_str = ", ".join(str(obj) for obj in reserved_objects)
+            raise ValidationError(f"Cannot delete system defaults: {reserved_str}.")
+
+        return super().delete()
+
+    def system_reserved(self):
+        return self.filter(is_system_reserved=True)
+
+    def transfer(self):
+        return self.system_reserved().filter(is_transfer=True)
+
+
+class CategoryManager(models.Manager.from_queryset(SystemReservedQuerySet)):
+    pass
+
+
 class Category(TimeStampMixin, StyleMixin):
     class CategoryType(models.TextChoices):
         INCOME = "+", "Income"
@@ -98,15 +120,36 @@ class Category(TimeStampMixin, StyleMixin):
                              blank=False,
                              on_delete=models.CASCADE)
 
+    is_system_reserved = models.BooleanField(blank=False, null=False, default=False, verbose_name="System reserved")
+    is_transfer = models.BooleanField(blank=False, null=False, default=False, verbose_name="Transfer")
+
+    objects = CategoryManager()
+
     class Meta:
         verbose_name = "Category"
         verbose_name_plural = "Categories"
+        constraints = [
+            CheckConstraint(
+                condition=Q(is_transfer=False) | Q(is_system_reserved=True),
+                name='transfer_requires_system_reserved',
+            ),
+            UniqueConstraint(
+                fields=['user', 'category_type'],
+                condition=Q(is_transfer=True),
+                name='unique_transfer_per_user_and_type',
+            ),
+        ]
 
     def __str__(self):
         return f"{self.name} category"
 
     def get_absolute_url(self):
         return reverse('category_list')
+
+    def delete(self, *args, **kwargs):
+        if self.is_system_reserved:
+            raise ValidationError(f"Cannot delete system default: {self}.")
+        return super().delete(*args, **kwargs)
 
     @property
     def is_income(self):
@@ -167,6 +210,13 @@ class Transaction(TimeStampMixin):
 
     def get_absolute_url(self):
         return reverse('dashboard')
+
+    def get_update_url(self):
+        transfer = Transfer.objects.filter(Q(txn_from=self) | Q(txn_to=self))
+        if transfer:
+            return reverse('transfer_update', kwargs={'pk': transfer[0].pk})
+        else:
+            return reverse('transaction_update', kwargs={'pk': self.pk})
 
 
 class Transfer(TimeStampMixin):
