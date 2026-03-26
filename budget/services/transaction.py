@@ -1,4 +1,4 @@
-from decimal import Decimal
+from decimal import Decimal, ROUND_HALF_UP
 
 from django.db import transaction
 from django.db.models import F
@@ -8,6 +8,7 @@ from budget.models import Transaction, Account
 
 
 class TransactionService:
+    EXCHANGE_RATE_PRECISION = Decimal("0.001")
 
     @staticmethod
     def _change_account_balance(account_id: int, delta: Decimal) -> None:
@@ -16,8 +17,22 @@ class TransactionService:
         )
 
     @staticmethod
+    def _set_exchange_rate(txn: Transaction) -> None:
+        if txn.amount == 0:
+            raise ValueError("Transaction amount cannot be zero when calculating exchange rate")
+
+        if txn.amount != txn.account_amount:
+            txn.exchange_rate = (txn.account_amount / txn.amount).quantize(
+                TransactionService.EXCHANGE_RATE_PRECISION,
+                rounding=ROUND_HALF_UP,
+            )
+        else:
+            txn.exchange_rate = Decimal("1")
+
+    @staticmethod
     @transaction.atomic
     def add_from_object(txn: Transaction) -> Transaction:
+        TransactionService._set_exchange_rate(txn)
         txn.save()
         TransactionService._change_account_balance(txn.account_id, txn.account_amount)
         return txn
@@ -30,7 +45,7 @@ class TransactionService:
 
     @staticmethod
     @transaction.atomic
-    def update(form: TransactionForm):
+    def update(form: TransactionForm) -> Transaction:
         if not form.instance.pk:
             raise ValueError("Transaction must exist for update")
 
@@ -44,11 +59,12 @@ class TransactionService:
             TransactionService._change_account_balance(old_txn.account_id, -old_txn.account_amount)
             TransactionService._change_account_balance(txn.account_id, txn.account_amount)
 
+        TransactionService._set_exchange_rate(txn)
         return txn
 
     @staticmethod
     @transaction.atomic
-    def delete(txn: Transaction):
+    def delete(txn: Transaction) -> None:
         if not txn.pk:
             raise ValueError("Transaction must exist for delete")
 
