@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+
+{% block body %}
+    <div class="dropdown position-fixed bottom-0 end-0 mb-5 me-5">
+        <button class="btn btn-primary py-2 dropdown-toggle d-flex align-items-center" id="bd-theme" type="button"
+                aria-expanded="false" data-bs-toggle="dropdown" aria-label="Toggle theme (auto)">
+            <i id="theme-icon" class="bi bi-circle-half"></i>
+        </button>
+        <ul class="dropdown-menu dropdown-menu-end">
+            <li>
+                <button type="button" class="dropdown-item d-flex align-items-center"
+                        data-bs-theme-value="light" aria-pressed="false">
+                    <i class="bi bi-sun-fill"></i><span class="ms-2">Light</span>
+                </button>
+            </li>
+            <li>
+                <button type="button" class="dropdown-item d-flex align-items-center"
+                        data-bs-theme-value="dark" aria-pressed="false">
+                    <i class="bi bi-moon-stars-fill"></i><span class="ms-2">Dark</span>
+                </button>
+            </li>
+            <li>
+                <button type="button" class="dropdown-item d-flex align-items-center"
+                        data-bs-theme-value="auto" aria-pressed="false">
+                    <i class="bi bi-circle-half"></i><span class="ms-2">Auto</span>
+                </button>
+            </li>
+        </ul>
+    </div>
+{% endblock %}

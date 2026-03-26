@@ -47,6 +47,65 @@
         integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"
         crossorigin="anonymous"></script>
 
-{% block extra_js %}{% endblock %}
+{% block extra_js %}
+    <script>
+        const themeIcon = document.getElementById('theme-icon')
+        const themeButtons = document.querySelectorAll('[data-bs-theme-value]')
+
+        const iconMap = {
+            light: 'bi bi-sun-fill',
+            dark: 'bi bi-moon-stars-fill',
+            auto: 'bi bi-circle-half'
+        }
+
+        const getPreferredTheme = () => {
+            const savedTheme = localStorage.getItem('theme')
+            return savedTheme || 'auto'
+        }
+
+        const applyTheme = (theme) => {
+            if (theme === 'auto') {
+                const systemDark = window.matchMedia('(prefers-color-scheme: dark)').matches
+                document.documentElement.setAttribute('data-bs-theme', systemDark ? 'dark' : 'light')
+            } else {
+                document.documentElement.setAttribute('data-bs-theme', theme)
+            }
+
+            themeIcon.className = iconMap[theme]
+        }
+
+        const updateActiveState = (theme) => {
+            themeButtons.forEach(btn => {
+                const isActive = btn.getAttribute('data-bs-theme-value') === theme
+                btn.setAttribute('aria-pressed', isActive ? 'true' : 'false')
+                btn.classList.toggle('active', isActive)
+            })
+        }
+
+        const setStoredTheme = (theme) => {
+            localStorage.setItem('theme', theme)
+            applyTheme(theme)
+            updateActiveState(theme)
+        }
+
+        const initialTheme = getPreferredTheme()
+        applyTheme(initialTheme)
+        updateActiveState(initialTheme)
+
+        themeButtons.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const theme = btn.getAttribute('data-bs-theme-value')
+                setStoredTheme(theme)
+            })
+        })
+
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+            const currentTheme = getPreferredTheme()
+            if (currentTheme === 'auto') {
+                applyTheme('auto')
+            }
+        })
+    </script>
+{% endblock %}
 </body>
 </html>
