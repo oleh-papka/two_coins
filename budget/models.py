@@ -34,6 +34,11 @@ class Account(TimeStampMixin, StyleMixin):
                                   max_digits=10,
                                   decimal_places=2,
                                   verbose_name="Balance")
+    initial_balance = models.DecimalField(null=False,
+                                          blank=False,
+                                          max_digits=10,
+                                          decimal_places=2,
+                                          verbose_name="Initial balance")
     user = models.ForeignKey('users.User',
                              null=False,
                              blank=False,

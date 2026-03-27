@@ -1,4 +1,6 @@
 from django import forms
+from django.db.models.aggregates import Sum
+from django.utils import timezone
 
 from budget.forms.fields import AmountCurrencyField
 from budget.models import Transaction, Currency
@@ -59,14 +61,33 @@ class TransactionForm(BootstrapFormMixin, forms.ModelForm):
         }
 
         if currency == account.currency:
-            cleaned_data["account_amount"] = normalized_amount
+            account_amount = normalized_amount
         else:
             if account_amount is None:
                 self.add_error("account_amount", "Required for currency conversion")
+                return cleaned_data
             else:
-                cleaned_data["account_amount"] = (
+                account_amount = (
                     abs(account_amount) if category.is_income else -abs(account_amount)
                 )
+
+        cleaned_data["account_amount"] = account_amount
+
+        if category.is_income:
+            return cleaned_data
+
+        if not account.allow_negative:
+            if self.instance and self.instance.pk:
+                delta = account_amount - self.instance.account_amount
+            else:
+                delta = account_amount
+
+            if account.balance + delta < 0:
+                self.add_error("amount_currency",
+                               "Account does not have enough balance (change amount or allow negative balance for an account)")
+                self.add_error("account_amount",
+                               "Account does not have enough balance (change amount or allow negative balance for an account)")
+                return cleaned_data
 
         return cleaned_data
 

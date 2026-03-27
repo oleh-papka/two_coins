@@ -1,7 +1,10 @@
 from decimal import Decimal
+from multiprocessing.spawn import old_main_modules
 
 from django import forms
+from django.db.models.aggregates import Sum
 from django.db.transaction import commit
+from django.utils import timezone
 
 from budget.models import Account, Transaction, Transfer
 from budget.services.transfer import TransferService
@@ -67,7 +70,28 @@ class TransferForm(BootstrapFormMixin, forms.ModelForm):
         else:
             cleaned_data['amount_to'] = abs(amount_from)
 
-        cleaned_data['amount_from'] = -abs(amount_from)
+        amount_from = -abs(amount_from)
+        cleaned_data['amount_from'] = amount_from
+
+        if self.instance and self.instance.pk:
+            if self.instance.to_account != account_to:
+                if ((self.instance.to_account.balance - self.instance.txn_to.account_amount) < 0) and (
+                        not self.instance.to_account.allow_negative):
+                    self.add_error("account_to", "Change will result negative balance for an account")
+                    return cleaned_data
+
+            if self.instance.from_account == account_from:
+                if ((account_from.balance + amount_from - self.instance.txn_from.account_amount) < 0) and (
+                not account_from.allow_negative):
+                    self.add_error("account_from",
+                                   "Account does not have enough balance (change amount or allow negative balance for an account)")
+                    return cleaned_data
+        else:
+            if not account_from.allow_negative:
+                if (account_from.balance + amount_from) < 0:
+                    self.add_error("account_from",
+                                   "Account does not have enough balance (change amount or allow negative balance for an account)")
+                    return cleaned_data
 
         return cleaned_data
 

@@ -60,6 +60,10 @@ class AccountCreateView(CreateMixin):
     model = Account
     form_class = AccountForm
 
+    def form_valid(self, form):
+        form.instance.initial_balance = form.instance.balance
+        return super().form_valid(form)
+
 
 class AccountUpdateView(UpdateMixin):
     model = Account
