@@ -1,5 +1,4 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.core.exceptions import ImproperlyConfigured
 from django.http import HttpResponseRedirect
 from django.views.generic import DeleteView
 
@@ -17,13 +16,13 @@ class DeleteMixin(LoginRequiredMixin, DeleteView):
         return ctx
 
     def get_service(self):
-        if not self.model_service:
-            raise ImproperlyConfigured("'model_service' is not set!")
-
         return self.model_service
 
     def form_valid(self, form):
         service = self.get_service()
-        service.delete(self.object)
+        if service:
+            service.delete(self.object)
+        else:
+            self.object.delete()
 
         return HttpResponseRedirect(self.get_success_url())

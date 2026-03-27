@@ -87,6 +87,10 @@ class TransactionUpdateView(UpdateMixin):
             for currency in Currency.objects.all()
         }
 
+        ctx["category_symbol_map"] = {
+            str(category.id): '-' if category.is_expense else '+' for category in Category.objects.all()
+        }
+
         return ctx
 
     def form_valid(self, form):

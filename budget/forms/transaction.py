@@ -1,6 +1,6 @@
-from decimal import Decimal
-
 from django import forms
+from django.db.models.aggregates import Sum
+from django.utils import timezone
 
 from budget.forms.fields import AmountCurrencyField
 from budget.models import Transaction, Currency
@@ -10,6 +10,10 @@ from core.services.decimal import format_decimal_for_input
 
 class TransactionForm(BootstrapFormMixin, forms.ModelForm):
     amount_currency = AmountCurrencyField(label="Amount")
+    account_amount = forms.DecimalField(required=False,
+                                        decimal_places=2,
+                                        max_digits=10,
+                                        label="Amount in account's currency")
 
     class Meta:
         model = Transaction
@@ -27,9 +31,10 @@ class TransactionForm(BootstrapFormMixin, forms.ModelForm):
 
         if self.instance and self.instance.pk:
             self.initial["amount_currency"] = {
-                "amount": format_decimal_for_input(self.instance.amount),
+                "amount": format_decimal_for_input(abs(self.instance.amount)),
                 "currency": self.instance.currency_id,
             }
+            self.initial["account_amount"] = format_decimal_for_input(abs(self.instance.account_amount))
 
     def clean(self):
         cleaned_data = super().clean()
@@ -56,14 +61,33 @@ class TransactionForm(BootstrapFormMixin, forms.ModelForm):
         }
 
         if currency == account.currency:
-            cleaned_data["account_amount"] = normalized_amount
+            account_amount = normalized_amount
         else:
             if account_amount is None:
                 self.add_error("account_amount", "Required for currency conversion")
+                return cleaned_data
             else:
-                cleaned_data["account_amount"] = (
+                account_amount = (
                     abs(account_amount) if category.is_income else -abs(account_amount)
                 )
+
+        cleaned_data["account_amount"] = account_amount
+
+        if category.is_income:
+            return cleaned_data
+
+        if not account.allow_negative:
+            if self.instance and self.instance.pk:
+                delta = account_amount - self.instance.account_amount
+            else:
+                delta = account_amount
+
+            if account.balance + delta < 0:
+                self.add_error("amount_currency",
+                               "Account does not have enough balance (change amount or allow negative balance for an account)")
+                self.add_error("account_amount",
+                               "Account does not have enough balance (change amount or allow negative balance for an account)")
+                return cleaned_data
 
         return cleaned_data
 

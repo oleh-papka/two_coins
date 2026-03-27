@@ -1,0 +1,5 @@
+<div class="form-check form-switch mb-3">
+    <input style="transform: scale(1.5); transform-origin: left center" type="{{ widget.type }}" name="{{ widget.name }}"{% if widget.value != None %}
+           value="{{ widget.value|stringformat:'s' }}"{% endif %}{% include "django/forms/widgets/attrs.html" %}>
+</div>
+

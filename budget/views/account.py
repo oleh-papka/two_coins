@@ -13,7 +13,6 @@ from budget.mixins.delete import DeleteMixin
 from budget.mixins.list import ListMixin
 from budget.mixins.update import UpdateMixin
 from budget.models import Account, Transaction
-from budget.services.account import AccountService
 
 
 class AccountDetailView(LoginRequiredMixin, DetailView):
@@ -32,7 +31,7 @@ class AccountDetailView(LoginRequiredMixin, DetailView):
 
         for transaction in transactions:
             txns.append({
-                'id': transaction.id,
+                'url': transaction.get_update_url(),
                 'category': transaction.category.name,
                 'badge_color': transaction.category.color,
                 'date': transaction.performed_date.strftime('%d.%m.%Y'),
@@ -61,6 +60,10 @@ class AccountCreateView(CreateMixin):
     model = Account
     form_class = AccountForm
 
+    def form_valid(self, form):
+        form.instance.initial_balance = form.instance.balance
+        return super().form_valid(form)
+
 
 class AccountUpdateView(UpdateMixin):
     model = Account
@@ -70,7 +73,6 @@ class AccountUpdateView(UpdateMixin):
 class AccountDeleteView(DeleteMixin):
     model = Account
     success_url = reverse_lazy('account_list')
-    model_service = AccountService
 
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)

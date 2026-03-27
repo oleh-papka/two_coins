@@ -13,7 +13,6 @@ from budget.mixins.delete import DeleteMixin
 from budget.mixins.list import ListMixin
 from budget.mixins.update import UpdateMixin
 from budget.models import Category, Transaction
-from budget.services.category import CategoryService
 
 
 class CategoryDetailView(LoginRequiredMixin, DetailView):
@@ -72,7 +71,6 @@ class CategoryUpdateView(UpdateMixin):
 class CategoryDeleteView(DeleteMixin):
     model = Category
     success_url = reverse_lazy('category_list')
-    model_service = CategoryService
 
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
