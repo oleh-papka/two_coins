@@ -202,7 +202,7 @@ class Transaction(TimeStampMixin):
         return f"Transaction of {self.account.name}"
 
     def get_absolute_url(self):
-        return reverse('dashboard')
+        return reverse('transaction_list')
 
     def get_update_url(self):
         transfer = Transfer.objects.filter(Q(txn_from=self) | Q(txn_to=self))

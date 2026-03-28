@@ -24,7 +24,7 @@
                     Transactions
                 </h3>
 
-                <div class="card-body p-0">
+                <div class="card-body p-0" style="max-height: 400px; overflow-y: scroll;">
                     <table class="table table-striped mb-0 align-middle"
                            style="border: transparent; font-size: medium;">
                         <tbody>
@@ -47,7 +47,7 @@
                                     </h5>
                                 </td>
                                 <td class="text-center">
-                                    <a href="{% url 'transaction_update' txn.id %}">
+                                    <a href="{{ txn.get_update_url }}">
                                         <i class="bi bi-three-dots-vertical"></i>
                                     </a>
                                 </td>

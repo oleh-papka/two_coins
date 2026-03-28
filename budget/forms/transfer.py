@@ -1,12 +1,10 @@
 from decimal import Decimal
-from multiprocessing.spawn import old_main_modules
 
 from django import forms
-from django.db.models.aggregates import Sum
 from django.db.transaction import commit
 from django.utils import timezone
 
-from budget.models import Account, Transaction, Transfer
+from budget.models import Account, Transfer
 from budget.services.transfer import TransferService
 from core.mixins.forms import BootstrapFormMixin
 from core.services.decimal import format_decimal_for_input
@@ -29,7 +27,7 @@ class TransferForm(BootstrapFormMixin, forms.ModelForm):
                                    max_digits=10,
                                    min_value=Decimal("0.01"),
                                    label="Amount received")
-    performed_date = forms.DateField(required=False, label="Date transferred",
+    performed_date = forms.DateField(required=False, label="Date transferred", initial=timezone.localdate,
                                      widget=forms.DateInput(attrs={'type': 'date'}))
 
     class Meta:
@@ -82,7 +80,7 @@ class TransferForm(BootstrapFormMixin, forms.ModelForm):
 
             if self.instance.from_account == account_from:
                 if ((account_from.balance + amount_from - self.instance.txn_from.account_amount) < 0) and (
-                not account_from.allow_negative):
+                        not account_from.allow_negative):
                     self.add_error("account_from",
                                    "Account does not have enough balance (change amount or allow negative balance for an account)")
                     return cleaned_data

@@ -25,24 +25,12 @@ class CategoryDetailView(LoginRequiredMixin, DetailView):
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
 
-        txns = []
         transactions = (
             Transaction.objects.filter(category=self.object, performed_date__month=timezone.now().month).order_by(
                 '-performed_date')
         )
 
-        for transaction in transactions:
-            txns.append({
-                'id': transaction.id,
-                'account': transaction.account.name,
-                'badge_color': transaction.account.color,
-                'date': transaction.performed_date.strftime('%d.%m.%Y'),
-                'amount': transaction.amount,
-                'currency': transaction.currency.symbol,
-            })
-
-        ctx['transactions'] = txns
-
+        ctx['transactions'] = transactions
         ctx['stats_total'] = transactions.aggregate(total=Coalesce(Sum("amount"), Decimal("0")))['total']
 
         return ctx

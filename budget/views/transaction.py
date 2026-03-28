@@ -20,7 +20,7 @@ class TransactionListView(FilterView, ListMixin):
     filterset_class = TransactionFilter
 
     def get_queryset(self):
-        return Transaction.objects.all().order_by('-performed_date')
+        return super().get_queryset().order_by('-performed_date')
 
 
 class TransactionCreateView(CreateMixin):
