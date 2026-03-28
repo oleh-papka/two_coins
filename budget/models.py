@@ -85,6 +85,9 @@ class SystemReservedQuerySet(models.QuerySet):
     def transfer(self):
         return self.system_reserved().filter(is_transfer=True)
 
+    def user_accessible(self):
+        return self.filter(is_transfer=False)
+
 
 class CategoryManager(models.Manager.from_queryset(SystemReservedQuerySet)):
     pass

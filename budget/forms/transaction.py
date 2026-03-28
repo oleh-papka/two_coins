@@ -1,9 +1,7 @@
 from django import forms
-from django.db.models.aggregates import Sum
-from django.utils import timezone
 
 from budget.forms.fields import AmountCurrencyField
-from budget.models import Transaction, Currency
+from budget.models import Transaction, Currency, Category
 from core.mixins.forms import BootstrapFormMixin
 from core.services.decimal import format_decimal_for_input
 
@@ -23,6 +21,8 @@ class TransactionForm(BootstrapFormMixin, forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self._init_bootstrap()
+
+        self.fields["category"].queryset = Category.objects.user_accessible().order_by("is_system_reserved")
 
         currencies = Currency.objects.all()
         self.fields["amount_currency"].fields[1].queryset = currencies
