@@ -21,9 +21,11 @@
                             <button class="btn" onclick="location.href = '{% url 'category_update' object.pk %}';">
                                 <i class="bi bi-gear"></i>
                             </button>
-                            <a href="{% url 'category_delete' object.pk %}" class="btn btn-danger">
-                                <i class="bi bi-trash3"></i>
-                            </a>
+                            {% if not object.is_system_reserved %}
+                                <a href="{% url 'category_delete' object.pk %}" class="btn btn-danger">
+                                    <i class="bi bi-trash3"></i>
+                                </a>
+                            {% endif %}
                         </div>
                     </div>
                 </div>
@@ -54,17 +56,17 @@
                     Transactions
                 </h3>
 
-                <div class="card-body p-0">
+                <div class="card-body p-0" style="max-height: 400px; overflow-y: scroll;">
                     <table class="table table-striped mb-0" style="border: transparent;">
                         <tbody>
                         {% for txn in transactions %}
                             <tr>
-                                <td>{{ txn.date }}</td>
+                                <td>{{ txn.performed_date|date:'d.m.Y' }}</td>
                                 <td class="text-center"><span
-                                        class="badge {{ txn.badge_color }}">{{ txn.account }}</span></td>
+                                        class="badge {{ txn.account.color }}">{{ txn.account.name }}</span></td>
                                 <td class="text-end {% if txn.amount > 0 %}text-success{% else %}text-danger{% endif %} ">{{ txn.amount|floatformat }} {{ txn.currency }}</td>
                                 <td class="text-center">
-                                    <a href="{% url 'transaction_update' txn.id %}">
+                                    <a href="{{ txn.get_update_url }}">
                                         <i class="bi bi-three-dots-vertical"></i>
                                     </a>
                                 </td>

@@ -65,19 +65,19 @@
                         <tbody>
                         {% for txn in transactions %}
                             <tr>
-                                <td>{{ txn.date }}</td>
+                                <td>{{ txn.performed_date|date:'d.m.Y' }}</td>
                                 <td class="text-center">
                                     <h5 class="mb-0">
-                                        <span class="badge {{ txn.badge_color }}">{{ txn.category }}</span>
+                                        <span class="badge {{ txn.category.color }}">{{ txn.category.name }}</span>
                                     </h5>
                                 </td>
                                 <td class="text-end {% if txn.amount > 0 %}text-success{% else %}text-danger{% endif %} ">
                                     <h5 class="mb-0">
-                                        {{ txn.amount|floatformat }} {{ txn.currency }}
+                                        {{ txn.amount|floatformat }} {{ txn.currency.symbol }}
                                     </h5>
                                 </td>
                                 <td class="text-center">
-                                    <a href="{{ txn.url }}">
+                                    <a href="{{ txn.get_update_url }}">
                                         <i class="bi bi-three-dots-vertical"></i>
                                     </a>
                                 </td>

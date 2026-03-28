@@ -85,6 +85,9 @@ class SystemReservedQuerySet(models.QuerySet):
     def transfer(self):
         return self.system_reserved().filter(is_transfer=True)
 
+    def user_accessible(self):
+        return self.filter(is_transfer=False)
+
 
 class CategoryManager(models.Manager.from_queryset(SystemReservedQuerySet)):
     pass
@@ -134,7 +137,7 @@ class Category(TimeStampMixin, StyleMixin):
         return f"{self.name} category"
 
     def get_absolute_url(self):
-        return reverse('category_list')
+        return reverse('category_detail', kwargs={"pk": self.pk})
 
     def delete(self, *args, **kwargs):
         if self.is_system_reserved:
@@ -199,7 +202,7 @@ class Transaction(TimeStampMixin):
         return f"Transaction of {self.account.name}"
 
     def get_absolute_url(self):
-        return reverse('dashboard')
+        return reverse('transaction_list')
 
     def get_update_url(self):
         transfer = Transfer.objects.filter(Q(txn_from=self) | Q(txn_to=self))

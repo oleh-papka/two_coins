@@ -2,6 +2,7 @@ from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.views import LoginView
+from django.http import HttpResponseRedirect
 from django.shortcuts import redirect
 from django.urls import reverse_lazy
 from django.views import View
@@ -10,6 +11,7 @@ from django.views.generic import UpdateView, CreateView
 from two_coins.settings import LOGIN_URL
 from users.forms import UserForm, CustomAuthenticationForm, UserAddForm
 from users.models import User
+from users.services.user import UserService
 
 
 class UserEditView(LoginRequiredMixin, UpdateView):
@@ -56,17 +58,20 @@ class CustomRegisterView(CreateView):
     success_url = reverse_lazy('dashboard')
 
     def form_valid(self, form):
-        response = super().form_valid(form)
+        self.object = form.save()
+
         email = form.cleaned_data.get('email')
         password = form.cleaned_data.get('password1')
         user = authenticate(username=email, password=password)
 
         if user is not None:
             login(self.request, user)
+            UserService.create_default_data(self.object)
             messages.success(self.request, "User created successfully!")
-            messages.info(self.request, f"Logged in as {email}.")
-        return response
+            messages.info(self.request, f"Logged in as {email}")
+
+        return HttpResponseRedirect(self.get_success_url())
 
     def form_invalid(self, form):
-        messages.warning(self.request, "Something went wrong.")
+        messages.warning(self.request, "Cannot create user! Please check your inputs and try again")
         return super().form_invalid(form)
