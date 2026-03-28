@@ -1,20 +1,21 @@
 from django import forms
-from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
+from django.contrib.auth.forms import AuthenticationForm, BaseUserCreationForm
 
 from core.mixins.forms import BootstrapFormMixin
 from users.models import User
 
 
-class UserAddForm(BootstrapFormMixin, UserCreationForm):
+class UserAddForm(BootstrapFormMixin, BaseUserCreationForm):
     class Meta:
         model = User
         fields = ('email', 'password1', 'password2')
+        field_classes = {'email': forms.EmailField}
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self._init_bootstrap()
 
-        self.fields["email"].widget.attrs["autocomplete"] = "email"
+        self.fields["email"].widget.attrs |= {'autocomplete': 'email', 'autofocus': True}
         self.fields["password1"].widget.attrs["autocomplete"] = "new-password"
         self.fields["password2"].widget.attrs["autocomplete"] = "new-password"
 
