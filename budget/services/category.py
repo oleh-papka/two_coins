@@ -22,17 +22,17 @@ class CategoryService:
             "is_transfer": False
         },
         {
-            'name': 'Transfer to',
+            'name': 'Transfer',
             "color": "bg-body",
-            "icon": "↗️",
+            "icon": "↘️",
             "category_type": "+",
             "is_system_reserved": True,
             "is_transfer": True
         },
         {
-            'name': 'Transfer from',
+            'name': 'Transfer',
             "color": "bg-body",
-            "icon": "↘️",
+            "icon": "↗️",
             "category_type": "-",
             "is_system_reserved": True,
             "is_transfer": True
