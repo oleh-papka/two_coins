@@ -21,9 +21,11 @@
                             <button class="btn" onclick="location.href = '{% url 'category_update' object.pk %}';">
                                 <i class="bi bi-gear"></i>
                             </button>
-                            <a href="{% url 'category_delete' object.pk %}" class="btn btn-danger">
-                                <i class="bi bi-trash3"></i>
-                            </a>
+                            {% if not object.is_system_reserved %}
+                                <a href="{% url 'category_delete' object.pk %}" class="btn btn-danger">
+                                    <i class="bi bi-trash3"></i>
+                                </a>
+                            {% endif %}
                         </div>
                     </div>
                 </div>

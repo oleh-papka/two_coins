@@ -108,6 +108,25 @@
     </nav>
 
     <div class="container-lg">
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-dismissible alert-{{ message.tags }} mb-3 mx-auto">
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    {% if message.tags == 'success' %}
+                        <h4 class="alert-heading">OK!</h4>
+                    {% elif message.tags == 'danger' %}
+                        <h4 class="alert-heading">Error!</h4>
+                    {% elif message.tags == 'warning' %}
+                        <h4 class="alert-heading">Warning!</h4>
+                    {% else %}
+                        <h4 class="alert-heading">Info</h4>
+                    {% endif %}
+
+                    <p class="mb-0">{{ message }}</p>
+                </div>
+            {% endfor %}
+        {% endif %}
+
         {% block content %}
             <div class="card mb-3">
                 <h3 class="card-header">Card header</h3>
@@ -185,6 +204,28 @@
                 if (!path) return '/';
                 return path.length > 1 && path.endsWith('/') ? path.slice(0, -1) : path;
             }
+        });
+
+        const alerts = document.querySelectorAll('.alert');
+
+        alerts.forEach(function (alertEl) {
+            let timeoutId;
+
+            function startAutoHide() {
+                timeoutId = setTimeout(function () {
+                    const bsAlert = bootstrap.Alert.getOrCreateInstance(alertEl);
+                    bsAlert.close();
+                }, 4000);
+            }
+
+            function stopAutoHide() {
+                clearTimeout(timeoutId);
+            }
+
+            startAutoHide();
+
+            alertEl.addEventListener('mouseenter', stopAutoHide);
+            alertEl.addEventListener('mouseleave', startAutoHide);
         });
     </script>
 {% endblock %}
