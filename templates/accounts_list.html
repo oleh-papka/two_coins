@@ -3,49 +3,211 @@
 
 {% block title %}🪙 2coins{% if title %} | {{ title }}{% else %}{% endif %}{% endblock %}
 
-{% block extra_css %}
-    {{ block.super }}
-    <style>
-        .card-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(18rem, 1fr));
-            gap: 1.3rem;
-            justify-items: center;
-            align-items: start;
-        }
-    </style>
-{% endblock %}
 
 {% block content %}
-    <div class="card-grid mb-3 tab-content bg-body-tertiary">
-        {% for object in object_list %}
-            <div class="card border-dark" style="max-width: 25rem; min-width: 18rem">
-
-                <h3 class="card-header {{ object.color }} bg-opacity-75">{{ object.icon|default:'💳' }} {{ object.name }}</h3>
+    <div class="d-flex flex-wrap justify-content-center gap-3 pb-3">
+        <div class="col" style="min-width: 20rem;">
+            <div class="card">
+                <h3 class="card-header">All accounts</h3>
 
                 <div class="card-body">
-                    <h2 class="card-title">{{ object.currency.symbol }} {{ object.balance|floatformat }} </h2>
-                    <h6 class="card-subtitle mb-3 text-muted">{{ object.description|default:'&nbsp;' }}</h6>
+                    <div class="d-flex flex-wrap justify-content-center gap-3">
+                        {% for object in object_list %}
+                            <div class="card border-dark" style="min-width: 18rem; max-width: 25rem; width: auto">
 
-                    <div class="d-flex justify-content-end gap-2 position-relative" style="z-index: 2;">
-                        <a href="{% url 'transaction_add' %}?account={{ object.pk }}"
-                           class="btn btn-primary flex-grow-1">
-                            Add transaction
-                        </a>
-                        <a href="{% url 'account_update' object.pk %}" class="btn"><i class="bi bi-gear"></i></a>
+                                <h3 class="card-header {{ object.color }} bg-opacity-75">{{ object.icon|default:'💳' }} {{ object.name }}</h3>
+
+                                <div class="card-body">
+                                    <h2 class="card-title">{{ object.currency.symbol }} {{ object.balance|floatformat }} </h2>
+                                    <h6 class="card-subtitle mb-3 text-muted">{{ object.description|default:'&nbsp;' }}</h6>
+
+                                    <div class="d-flex justify-content-end gap-2 position-relative" style="z-index: 2;">
+                                        <a href="{% url 'transaction_add' %}?account={{ object.pk }}"
+                                           class="btn btn-primary flex-grow-1">
+                                            Add transaction
+                                        </a>
+                                        <a href="{% url 'account_update' object.pk %}" class="btn"><i
+                                                class="bi bi-gear"></i></a>
+                                    </div>
+                                </div>
+
+                                <a href="{% url 'account_detail' object.pk %}" class="stretched-link"></a>
+                            </div>
+                        {% endfor %}
+
+                        <div class="card border-dark" style="min-width: 18rem; max-width: 25rem; width: auto">
+                            <div class="card-body d-flex flex-column justify-content-center align-items-center text-center">
+                                <a href="{% url 'account_add' %}" class="btn btn-secondary">
+                                    Add new account
+                                </a>
+                            </div>
+                        </div>
                     </div>
                 </div>
-
-                <a href="{% url 'account_detail' object.pk %}" class="stretched-link"></a>
-            </div>
-        {% endfor %}
-
-        <div class="card border-dark h-100" style="max-width: 25rem; min-width: 18rem;">
-            <div class="card-body d-flex flex-column justify-content-center align-items-center text-center">
-                <a href="{% url 'account_add' %}" class="btn btn-secondary">
-                    Add new account
-                </a>
             </div>
         </div>
+
+        <div class="col" style="min-width: 22rem;">
+            <div class="card">
+                <h3 class="card-header">Stats</h3>
+
+                {% for row in total_by_currency %}
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <h4 class="mb-0">{{ row.currency_name }} accounts total:</h4>
+                            <h4 class="mb-0">{{ row.total_balance|floatformat }} {{ row.currency_symbol }}</h4>
+                        </li>
+                    </ul>
+
+                    {% if row.chart_data %}
+                        <div class="card-body">
+                            <div id="{{ row.currency_abbr }}" style="width: 100%;min-height: 300px;"></div>
+                        </div>
+                    {% endif %}
+                {% endfor %}
+            </div>
+        </div>
+
     </div>
+{% endblock %}
+
+
+{% block extra_js %}
+    {{ block.super }}
+
+    <script src="https://cdn.jsdelivr.net/npm/echarts/dist/echarts.min.js"></script>
+
+    <script>
+        const total_by_currency = {{ total_by_currency|safe }};
+
+        document.addEventListener('DOMContentLoaded', function () {
+            function getBootstrapThemeVars() {
+                const root = document.documentElement;
+                const styles = getComputedStyle(root);
+                const theme = root.getAttribute('data-bs-theme') || 'light';
+
+                return {
+                    theme,
+                    isDark: theme === 'dark',
+                    bodyColor: styles.getPropertyValue('--bs-body-color').trim(),
+                    bodyBg: styles.getPropertyValue('--bs-body-bg').trim(),
+                    borderColor: styles.getPropertyValue('--bs-border-color').trim(),
+                    primary: styles.getPropertyValue('--bs-primary').trim(),
+                    secondaryColor: styles.getPropertyValue('--bs-secondary-color').trim()
+                };
+            }
+
+            function buildOption(currency, data) {
+                const bs = getBootstrapThemeVars();
+
+                return {
+                    backgroundColor: 'transparent',
+                    textStyle: {
+                        color: bs.bodyColor
+                    },
+                    tooltip: {
+                        trigger: 'item',
+                        backgroundColor: bs.bodyBg,
+                        borderColor: bs.borderColor,
+                        borderWidth: 2,
+                        textStyle: {
+                            color: bs.bodyColor
+                        },
+                        formatter: function (params) {
+                            return `
+                            <div style="color:${bs.bodyColor}">
+                                <span style="font-weight:bold;color:${params.color};">
+                                    ${params.name}
+                                </span>: ${params.value} ${currency}
+                            </div>
+                        `;
+                        }
+                    },
+                    series: [
+                        {
+                            name: currency,
+                            type: 'pie',
+                            radius: ['40%', '80%'],
+                            center: ['50%', '50%'],
+                            avoidLabelOverlap: false,
+                            padAngle: 4,
+                            itemStyle: {
+                                borderRadius: 10,
+                                borderColor: bs.bodyBg
+                            },
+                            label: {
+                                formatter: '{d}%',
+                                position: 'inside'
+                            },
+                            data: data
+                        }
+                    ]
+                };
+            }
+
+            if (!window.echarts || !Array.isArray(total_by_currency)) return;
+
+            const charts = [];
+
+            function renderAllCharts() {
+                charts.forEach(function (item) {
+                    item.chart.setOption(
+                        buildOption(item.currency_symbol, item.chart_data),
+                        true
+                    );
+                    item.chart.resize();
+                });
+            }
+
+            total_by_currency.forEach(function (row) {
+                if (!row.chart_data || !row.chart_data.length) return;
+
+                const dom = document.getElementById(row.currency_abbr);
+                if (!dom) return;
+
+                const chart = echarts.init(dom);
+
+                chart.setOption(
+                    buildOption(row.currency_symbol, row.chart_data),
+                    true
+                );
+
+                charts.push({
+                    dom: dom,
+                    chart: chart,
+                    currency_symbol: row.currency_symbol,
+                    chart_data: row.chart_data
+                });
+            });
+
+            window.addEventListener('resize', function () {
+                charts.forEach(function (item) {
+                    item.chart.resize();
+                });
+            });
+
+            const resizeObserver = new ResizeObserver(function () {
+                charts.forEach(function (item) {
+                    item.chart.resize();
+                });
+            });
+
+            charts.forEach(function (item) {
+                resizeObserver.observe(item.dom);
+            });
+
+            const themeObserver = new MutationObserver(function (mutations) {
+                for (const mutation of mutations) {
+                    if (mutation.attributeName === 'data-bs-theme') {
+                        renderAllCharts();
+                        break;
+                    }
+                }
+            });
+
+            themeObserver.observe(document.documentElement, {
+                attributes: true
+            });
+        });
+    </script>
 {% endblock %}
