@@ -1,94 +1,292 @@
 {% extends 'index.html' %}
 
-{% block title %}🪙 2coins{% if title %} | {{ title }}{% else %}{% endif %}{% endblock %}
 
-{% block extra_css %}
-    {{ block.super }}
-    <style>
-        .card-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-            gap: 1rem;
-            justify-items: center;
-            align-items: start;
-        }
-    </style>
-{% endblock %}
+{% block title %}🪙 2coins{% if title %} | {{ title }}{% else %}{% endif %}{% endblock %}
 
 
 {% block content %}
-    <ul class="nav nav-pills" role="tablist">
-        <li class="nav-item" role="presentation">
-            <a class="nav-link active" data-bs-toggle="tab" href="#expense" aria-selected="true"
-               role="tab">Expense</a>
-        </li>
-        <li class="nav-item" role="presentation">
-            <a class="nav-link" data-bs-toggle="tab" href="#income" aria-selected="false" role="tab" tabindex="-1">Income</a>
-        </li>
-    </ul>
-    <div id="categories" class="tab-content bg-body-tertiary">
-        <div class="tab-pane fade active show" id="expense" role="tabpanel">
-            <div class="card-grid">
-                {% for object in object_list %}
-                    {% if object.category_type == '-' %}
-                        <div class="card border-danger" style="max-width: 280px; min-width: 220px">
+    <div class="d-flex flex-wrap justify-content-center gap-3 pb-3">
+        <div class="col col-md-3" style="width: 22rem;">
+            <div class="card">
+                <h3 class="card-header">All categories</h3>
 
-                            <h3 class="card-header {{ object.color }} bg-opacity-75">{{ object.icon|default:'💳' }} {{ object.name }}</h3>
+                <div class="card-body border-bottom">
+                    <ul class="nav nav-pills gap-3" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <a class="nav-link active" data-bs-toggle="tab" href="#expense" aria-selected="true"
+                               role="tab">Expense</a>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <a class="nav-link" data-bs-toggle="tab" href="#income" aria-selected="false" role="tab"
+                               tabindex="-1">Income</a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="card-body p-0">
+                    <div id="categories" class="tab-content p-0 m-0" style="border: none">
+                        <div class="tab-pane fade active show" id="expense" role="tabpanel">
+                            <ul class="list-group list-group-flush">
+                                {% for object in object_list %}
+                                    {% if object.category_type == '-' %}
+                                        <li class="list-group-item d-flex justify-content-between align-items-center {{ object.color }} bg-opacity-75">
 
-                            <div class="card-body">
-                                <div class="d-flex gap-2 position-relative" style="z-index: 2;">
-                                    <a href="{% url 'transaction_add' %}?category={{ object.pk }}"
-                                       class="btn btn-primary flex-grow-1">Add transaction</a>
-                                    <a href="{% url 'category_update' object.pk %}" class="btn">
-                                        <i class="bi bi-gear"></i></a>
-                                </div>
-                            </div>
+                                            <a href="{% url 'category_detail' object.pk %}"
+                                               class="text-decoration-none">
+                                                <h4 class="mb-0">{{ object.icon|default:'💳' }} {{ object.name }}</h4>
+                                            </a>
+                                            <a href="{% url 'transaction_add' %}?category={{ object.pk }}"
+                                               class="btn"><i class="bi bi-plus-square text-primary"></i></a>
+                                        </li>
+                                    {% endif %}
+                                {% endfor %}
 
-                            <a href="{% url 'category_detail' object.pk %}" class="stretched-link"></a>
+                                <li class="list-group-item">
+
+                                    <a href="{% url 'category_add' %}?=category_type=-" class="btn w-100">
+                                        Add new Category
+                                    </a>
+                                </li>
+                            </ul>
                         </div>
-                    {% endif %}
-                {% endfor %}
+                        <div class="tab-pane fade" id="income" role="tabpanel">
+                            <ul class="list-group list-group-flush">
+                                {% for object in object_list %}
+                                    {% if object.category_type == '+' %}
+                                        <li class="list-group-item d-flex justify-content-between align-items-center {{ object.color }} bg-opacity-75">
 
-                <div class="card border-danger h-100" style="max-width: 280px; min-width: 220px;">
-                    <div class="card-body d-flex flex-column justify-content-center align-items-center text-center">
-                        <a href="{% url 'category_add' %}?=category_type=-" class="btn btn-secondary">
-                            Add new Category
-                        </a>
+                                            <a href="{% url 'category_detail' object.pk %}"
+                                               class="text-decoration-none">
+                                                <h4 class="mb-0">{{ object.icon|default:'💳' }} {{ object.name }}</h4>
+                                            </a>
+                                            <a href="{% url 'transaction_add' %}?category={{ object.pk }}"
+                                               class="btn"><i class="bi bi-plus-square text-primary"></i></a>
+                                        </li>
+                                    {% endif %}
+                                {% endfor %}
+
+                                <li class="list-group-item">
+
+                                    <a href="{% url 'category_add' %}?=category_type=+" class="btn w-100">
+                                        Add new Category
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-        <div class="tab-pane fade" id="income" role="tabpanel">
-            <div class="card-grid">
-                {% for object in object_list %}
-                    {% if object.category_type == '+' %}
-                        <div class="card border-success" style="max-width: 280px; min-width: 220px">
 
-                            <h3 class="card-header  {{ object.color }} bg-opacity-75">{{ object.icon|default:'💳' }} {{ object.name }}</h3>
+        <div class="col" style="min-width: 23rem;">
+            <div class="card">
+                <h3 class="card-header">Stats</h3>
 
-                            <div class="card-body">
-                                <div class="d-flex gap-2 position-relative" style="z-index: 2;">
-                                    <a href="{% url 'transaction_add' %}?category={{ object.pk }}"
-                                       class="btn btn-primary flex-grow-1">Add transaction</a>
-                                    <a href="{% url 'category_update' object.pk %}" class="btn">
-                                        <i class="bi bi-gear"></i></a>
-                                </div>
+                <div class="card-body">
+                    <form method="get" class="d-flex flex-wrap justify-content-between gap-3">
+                        <div class="d-flex flex-wrap gap-3">
+                            <div class="input-group  flex-fill" style="width: auto; min-width: 14rem;">
+                                <span class="input-group-text">From:</span>
+                                {# @formatter:off #}
+                                <input type="date" name="from_date" value="{{ from_date_value|default:'' }}"
+                                       class="form-control" placeholder="Date" id="id_from_date">
+                                {# @formatter:on #}
+                            </div>
+                            <div class="input-group flex-fill" style="width: auto; min-width: 14rem;">
+                                <span class="input-group-text">To:</span>
+                                {# @formatter:off #}
+                                <input type="date" name="to_date" value="{{ to_date_value|default:'' }}"
+                                       class="form-control" placeholder="Date" id="id_to_date">
+                                {# @formatter:on #}
                             </div>
 
-                            <a href="{% url  'category_detail' object.pk %}" class="stretched-link"></a>
+                            <div class="input-group flex-fill" style="width: auto; min-width: 12rem;">
+                                <span class="input-group-text">Currency:</span>
+                                <select class="form-select form-control" name="currency_id">
+                                    {% for currency in currencies %}
+                                        <option value="{{ currency.id }}"
+                                                {% if currency_id == currency.id %}
+                                                selected
+                                                {% endif %} >{{ currency.abbr }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                        <div class="d-flex gap-2">
+                            <a href="." class="btn">Reset</a>
+                            <button class="btn btn-primary">Filter</button>
+                        </div>
+                    </form>
+                </div>
+
+                {% for row in totals %}
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item d-flex justify-content-between align-items-center bg-body-tertiary">
+                            <h4 class="mb-0">{{ row.currency_name }} {{ row.type_name }} total:</h4>
+                            <h4 class="mb-0">{{ row.total_amount|floatformat }} {{ row.currency_symbol }}</h4>
+                        </li>
+                    </ul>
+
+                    {% if row.chart_data %}
+                        <div class="card-body">
+                            <div id="chart_{{ row.type_name }}" style="width: 100%;min-height: 300px;"></div>
                         </div>
                     {% endif %}
                 {% endfor %}
-
-
-                <div class="card border-success h-100" style="max-width: 280px; min-width: 220px;">
-                    <div class="card-body d-flex flex-column justify-content-center align-items-center text-center">
-                        <a href="{% url 'category_add' %}?category_type=+" class="btn btn-secondary">
-                            Add new Category
-                        </a>
-                    </div>
-                </div>
             </div>
         </div>
     </div>
 {% endblock %}
+
+
+{% block extra_js %}
+    {{ block.super }}
+
+    <script src="https://cdn.jsdelivr.net/npm/echarts/dist/echarts.min.js"></script>
+
+    <script>
+        const totals = {{ totals|safe }};
+
+        document.addEventListener('DOMContentLoaded', function () {
+            function getBootstrapThemeVars() {
+                const root = document.documentElement;
+                const styles = getComputedStyle(root);
+                const theme = root.getAttribute('data-bs-theme') || 'light';
+
+                return {
+                    theme,
+                    isDark: theme === 'dark',
+                    bodyColor: styles.getPropertyValue('--bs-body-color').trim(),
+                    bodyBg: styles.getPropertyValue('--bs-body-bg').trim(),
+                    borderColor: styles.getPropertyValue('--bs-border-color').trim(),
+                    primary: styles.getPropertyValue('--bs-primary').trim(),
+                    secondaryColor: styles.getPropertyValue('--bs-secondary-color').trim()
+                };
+            }
+
+            function buildOption(currency, type_name, labels, data) {
+                const bs = getBootstrapThemeVars();
+
+                return {
+                    backgroundColor: 'transparent',
+                    textStyle: {
+                        color: bs.bodyColor
+                    },
+                    tooltip: {
+                        trigger: 'item',
+                        backgroundColor: bs.bodyBg,
+                        borderColor: bs.borderColor,
+                        borderWidth: 2,
+                        textStyle: {
+                            color: bs.bodyColor
+                        },
+                        formatter: function (params) {
+                            return `
+                            <div style="color:${bs.bodyColor}">
+                                <span style="font-weight:bold;color:${params.color};">
+                                    ${params.name}
+                                </span>: ${params.value} ${currency}
+                            </div>
+                        `;
+                        }
+                    },
+                    xAxis: {
+                        type: 'category',
+                        data: labels
+                    },
+                    yAxis: {
+                        type: 'value',
+                        inverse: true
+                    },
+                    series: [
+                        {
+                            color: (type_name === 'expense'
+                                    ? getComputedStyle(document.body).getPropertyValue('--bs-danger')
+                                    : getComputedStyle(document.body).getPropertyValue('--bs-success')
+                            ).trim(),
+                            data: data,
+                            type: 'bar',
+                            showBackground: true,
+                            itemStyle: {
+                                borderRadius: 10,
+                                borderColor: bs.bodyBg
+                            },
+                            label: {
+                                formatter: '{d}%',
+                                position: 'inside'
+                            },
+                        }
+                    ],
+                };
+            }
+
+            if (!window.echarts || !Array.isArray(totals)) return;
+
+            const charts = [];
+
+            function renderAllCharts() {
+                charts.forEach(function (item) {
+                    item.chart.setOption(
+                        buildOption(item.currency_symbol, item.type_name, item.chart_data.labels, item.chart_data.data),
+                        true
+                    );
+                    item.chart.resize();
+                });
+            }
+
+            totals.forEach(function (row) {
+                console.log(row)
+                if (!row.chart_data) return;
+
+                const dom = document.getElementById(`chart_${row.type_name}`);
+
+                if (!dom) return;
+
+                const chart = echarts.init(dom);
+
+                chart.setOption(
+                    buildOption(row.currency_symbol, row.type_name, row.chart_data.labels, row.chart_data.data),
+                    true
+                );
+
+                charts.push({
+                    dom: dom,
+                    chart: chart,
+                    type_name: row.type_name,
+                    currency_symbol: row.currency_symbol,
+                    chart_data: row.chart_data
+                });
+            });
+
+            window.addEventListener('resize', function () {
+                charts.forEach(function (item) {
+                    item.chart.resize();
+                });
+            });
+
+            const resizeObserver = new ResizeObserver(function () {
+                charts.forEach(function (item) {
+                    item.chart.resize();
+                });
+            });
+
+            charts.forEach(function (item) {
+                resizeObserver.observe(item.dom);
+            });
+
+            const themeObserver = new MutationObserver(function (mutations) {
+                for (const mutation of mutations) {
+                    if (mutation.attributeName === 'data-bs-theme') {
+                        renderAllCharts();
+                        break;
+                    }
+                }
+            });
+
+            themeObserver.observe(document.documentElement, {
+                attributes: true
+            });
+        });
+    </script>
+
+{% endblock %}
+
