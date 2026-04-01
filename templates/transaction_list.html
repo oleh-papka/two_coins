@@ -5,10 +5,55 @@
 
 {% block content %}
     <div class="mb-4 bg-body-tertiary p-3 rounded border">
-        <form method="get" class="d-flex gap-3">
-            {% for field in filter.form %}
-                {{ field }}
-            {% endfor %}
+        <form method="get" class="d-flex flex-wrap justify-content-between gap-3">
+            <div class="d-flex flex-wrap gap-3">
+                {% for field in filter.form %}
+                    {% if field.name == "date_from" %}
+                        <div class="input-group flex-fill" style="width: auto; min-width: 14rem;">
+                            <span class="input-group-text">From:</span>
+                            {# @formatter:off #}
+                            <input type="date" name="{{ field.html_name }}" value="{{ field.value|date:'Y-m-d' }}"
+                                   class="form-control" id="{{ field.id_for_label }}">
+                            {# @formatter:on #}
+                        </div>
+                    {% elif field.name == "date_to" %}
+                        <div class="input-group flex-fill" style="width: auto; min-width: 14rem;">
+                            <span class="input-group-text">To:</span>
+                            {# @formatter:off #}
+                            <input type="date" name="{{ field.html_name }}" value="{{ field.value|date:'Y-m-d' }}"
+                                   class="form-control" id="{{ field.id_for_label }}">
+                            {# @formatter:on #}
+                        </div>
+
+                    {% elif field.name == "account" %}
+                        <div class="input-group flex-fill" style="width: auto; min-width: 12rem;">
+                            <select class="form-select form-control" name="{{ field.html_name }}"
+                                    id="{{ field.id_for_label }}">
+                                {% for value, label in field.field.choices %}
+                                    <option value="{{ value }}"
+                                            {% if value|stringformat:'s' == field.value|stringformat:'s' %}selected{% endif %}>
+                                        {{ label }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    {% elif field.name == "category" %}
+                        <div class="input-group flex-fill" style="width: auto; min-width: 12rem;">
+                            <select class="form-select form-control" name="{{ field.html_name }}"
+                                    id="{{ field.id_for_label }}">
+                                {% for value, label in field.field.choices %}
+                                    <option value="{{ value }}"
+                                            {% if value|stringformat:'s' == field.value|stringformat:'s' %}selected{% endif %}>
+                                        {{ label }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    {% else %}
+                        {{ field }}
+                    {% endif %}
+                {% endfor %}
+            </div>
 
             <div id="btns" class="d-flex gap-2">
                 <button type="submit" class="btn btn-primary">Filter</button>
@@ -17,7 +62,7 @@
         </form>
     </div>
 
-    <div class="d-flex flex-wrap justify-content-center gap-3">
+    <div class="d-flex flex-wrap justify-content-center gap-3 pb-3">
         <div class="col" style="min-width: 20rem; max-width: 30rem;">
             <div class="card mb-3">
                 <h3 class="card-header">
@@ -30,7 +75,7 @@
                         <tbody>
                         {% for txn in object_list %}
                             <tr>
-                                <td>{{ txn.performed_date|date:'d.m.Y' }}</td>
+                                <td class="d-none d-md-table-cell">{{ txn.performed_date|date:'d.m.Y' }}</td>
                                 <td class="text-center">
                                     <h5 class="mb-0">
                                         <span class="badge {{ txn.account.color }}">{{ txn.account.name }}</span>
@@ -63,15 +108,15 @@
             </div>
         </div>
 
-        <div class="col">
-            <div class="card mb-4" style="min-width: 30rem;">
+        <div class="col" style="min-width: 23rem;">
+            <div class="card">
                 <h3 class="card-header">
                     Stats
                 </h3>
 
                 {{ charts_by_currency|json_script:"charts-by-currency" }}
                 {% for chart in charts_by_currency %}
-                    <div class="currency-chart-block">
+                    <div {% if not forloop.first %}class="border-top"{% endif %}>
                         <div id="chart-{{ forloop.counter }}" style="width: 100%; height: 420px;"></div>
                     </div>
                 {% endfor %}
