@@ -189,13 +189,38 @@
                         `;
                         }
                     },
+                    grid: {
+                        left: 40,
+                        right: 20,
+                        top: 10,
+                        bottom: 10
+                    },
                     xAxis: {
                         type: 'category',
-                        data: labels
+                        data: labels,
+                        axisLine: {
+                            lineStyle: {
+                                color: bs.borderColor
+                            }
+                        },
+                        axisLabel: {
+                            color: bs.secondaryColor
+                        }
                     },
                     yAxis: {
                         type: 'value',
-                        inverse: true
+                        inverse: true,
+                        axisLine: {
+                            show: false
+                        },
+                        splitLine: {
+                            lineStyle: {
+                                color: bs.borderColor
+                            }
+                        },
+                        axisLabel: {
+                            color: bs.secondaryColor
+                        }
                     },
                     series: [
                         {
@@ -205,14 +230,9 @@
                             ).trim(),
                             data: data,
                             type: 'bar',
-                            showBackground: true,
                             itemStyle: {
-                                borderRadius: 10,
+                                borderRadius: 8,
                                 borderColor: bs.bodyBg
-                            },
-                            label: {
-                                formatter: '{d}%',
-                                position: 'inside'
                             },
                         }
                     ],

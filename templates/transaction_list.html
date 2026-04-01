@@ -19,7 +19,7 @@
 
     <div class="d-flex flex-wrap justify-content-center gap-3">
         <div class="col" style="min-width: 20rem; max-width: 30rem;">
-            <div class="card border-dark mb-3">
+            <div class="card mb-3">
                 <h3 class="card-header">
                     Transactions
                 </h3>
@@ -28,7 +28,7 @@
                     <table class="table table-striped mb-0 align-middle"
                            style="border: transparent; font-size: medium;">
                         <tbody>
-                        {% for txn in filter.qs %}
+                        {% for txn in object_list %}
                             <tr>
                                 <td>{{ txn.performed_date|date:'d.m.Y' }}</td>
                                 <td class="text-center">
@@ -64,13 +64,228 @@
         </div>
 
         <div class="col">
-            <div class="card border-dark" style="min-width: 30rem;">
+            <div class="card mb-4" style="min-width: 30rem;">
                 <h3 class="card-header">
                     Stats
                 </h3>
 
-                <div class="card-body"></div>
+                {{ charts_by_currency|json_script:"charts-by-currency" }}
+                {% for chart in charts_by_currency %}
+                    <div class="currency-chart-block">
+                        <div id="chart-{{ forloop.counter }}" style="width: 100%; height: 420px;"></div>
+                    </div>
+                {% endfor %}
             </div>
         </div>
     </div>
+{% endblock %}
+
+{% block extra_js %}
+    {{ block.super }}
+
+    <script src="https://cdn.jsdelivr.net/npm/echarts/dist/echarts.min.js"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const chartsByCurrency = JSON.parse(
+                document.getElementById('charts-by-currency').textContent
+            );
+
+            if (!window.echarts || !Array.isArray(chartsByCurrency)) return;
+
+            function getBootstrapThemeVars() {
+                const root = document.documentElement;
+                const styles = getComputedStyle(root);
+                const theme = root.getAttribute('data-bs-theme') || 'light';
+
+                return {
+                    theme,
+                    isDark: theme === 'dark',
+                    bodyColor: styles.getPropertyValue('--bs-body-color').trim(),
+                    bodyBg: styles.getPropertyValue('--bs-body-bg').trim(),
+                    borderColor: styles.getPropertyValue('--bs-border-color').trim(),
+                    primary: styles.getPropertyValue('--bs-primary').trim(),
+                    secondaryColor: styles.getPropertyValue('--bs-secondary-color').trim(),
+                    success: styles.getPropertyValue('--bs-success').trim(),
+                    danger: styles.getPropertyValue('--bs-danger').trim()
+                };
+            }
+
+            function buildOption(chartData) {
+                const bs = getBootstrapThemeVars();
+
+                const series = (chartData.series || []).map(function (serie) {
+                    return {
+                        ...serie,
+                        type: 'bar',
+                        stack: 'transactions'
+                    };
+                });
+
+                return {
+                    backgroundColor: 'transparent',
+                    textStyle: {
+                        color: bs.bodyColor
+                    },
+                    title: {
+                        text: chartData.currency_name,
+                        left: 10,
+                        top: 10,
+                        textStyle: {
+                            color: bs.bodyColor,
+                            fontSize: 16,
+                            fontWeight: 600
+                        }
+                    },
+                    tooltip: {
+                        trigger: 'axis',
+                        axisPointer: {
+                            type: 'shadow'
+                        },
+                        backgroundColor: bs.bodyBg,
+                        borderColor: bs.borderColor,
+                        borderWidth: 2,
+                        textStyle: {
+                            color: bs.bodyColor
+                        },
+                        formatter: function (params) {
+                            const visibleItems = params.filter(
+                                item => item.value !== '-' && item.value != null
+                            );
+
+                            if (!visibleItems.length) {
+                                return '';
+                            }
+
+                            const rows = visibleItems
+                                .map(item => `
+                                    <div style="color:${bs.bodyColor}; display:flex; justify-content:space-between; gap:12px;">
+                                        <span>
+                                            <span style="font-weight:bold; color:${item.color};">
+                                                ${item.seriesName}
+                                            </span>
+                                        </span>
+                                        <span>${item.value} ${chartData.currency_symbol}</span>
+                                    </div>
+                                `)
+                                .join('');
+
+                            const showTotal = visibleItems.length >= 2;
+                            const total = showTotal
+                                ? visibleItems.reduce((sum, item) => sum + Number(item.value), 0)
+                                : null;
+
+                            return `
+                                <div style="color:${bs.bodyColor}; min-width:180px;">
+                                    ${rows}
+                                    ${
+                                showTotal
+                                    ? `
+                                                <div style="margin-top:6px; padding-top:6px; border-top:1px solid ${bs.borderColor}; font-weight:600; display:flex; justify-content:space-between; gap:12px;">
+                                                    <span>Total</span>
+                                                    <span>${total} ${chartData.currency_symbol}</span>
+                                                </div>
+                                            `
+                                    : ''
+                            }
+                                </div>
+                            `;
+                        }
+                    },
+                    legend: {
+                        top: 42,
+                        textStyle: {
+                            color: bs.bodyColor
+                        }
+                    },
+                    grid: {
+                        left: 50,
+                        right: 20,
+                        top: 80,
+                        bottom: 40
+                    },
+                    xAxis: {
+                        type: 'category',
+                        data: chartData.dates,
+                        axisLine: {
+                            lineStyle: {
+                                color: bs.borderColor
+                            }
+                        },
+                        axisLabel: {
+                            color: bs.secondaryColor
+                        }
+                    },
+                    yAxis: {
+                        type: 'value',
+                        axisLine: {
+                            show: false
+                        },
+                        splitLine: {
+                            lineStyle: {
+                                color: bs.borderColor
+                            }
+                        },
+                        axisLabel: {
+                            color: bs.secondaryColor
+                        }
+                    },
+                    series: series
+                };
+            }
+
+            const charts = [];
+
+            function renderAllCharts() {
+                charts.forEach(function (item) {
+                    item.chart.setOption(buildOption(item.chartData), true);
+                    item.chart.resize();
+                });
+            }
+
+            chartsByCurrency.forEach(function (chartData, index) {
+                const dom = document.getElementById(`chart-${index + 1}`);
+                if (!dom) return;
+
+                const chart = echarts.init(dom);
+
+                chart.setOption(buildOption(chartData), true);
+
+                charts.push({
+                    dom: dom,
+                    chart: chart,
+                    chartData: chartData
+                });
+            });
+
+            window.addEventListener('resize', function () {
+                charts.forEach(function (item) {
+                    item.chart.resize();
+                });
+            });
+
+            const resizeObserver = new ResizeObserver(function () {
+                charts.forEach(function (item) {
+                    item.chart.resize();
+                });
+            });
+
+            charts.forEach(function (item) {
+                resizeObserver.observe(item.dom);
+            });
+
+            const themeObserver = new MutationObserver(function (mutations) {
+                for (const mutation of mutations) {
+                    if (mutation.attributeName === 'data-bs-theme') {
+                        renderAllCharts();
+                        break;
+                    }
+                }
+            });
+
+            themeObserver.observe(document.documentElement, {
+                attributes: true
+            });
+        });
+    </script>
 {% endblock %}
