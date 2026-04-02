@@ -137,7 +137,7 @@ class Category(TimeStampMixin, StyleMixin):
         return f"{self.name} category"
 
     def get_absolute_url(self):
-        return reverse('category_detail', kwargs={"pk": self.pk})
+        return reverse('category_list')
 
     def delete(self, *args, **kwargs):
         if self.is_system_reserved:
