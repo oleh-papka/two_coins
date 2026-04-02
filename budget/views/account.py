@@ -1,45 +1,14 @@
-import json
 from collections import defaultdict
-from decimal import Decimal
 
-from django.contrib.auth.mixins import LoginRequiredMixin
-from django.db.models import Sum, Q, F
-from django.db.models.functions import Coalesce
+from django.db.models import Sum, F
 from django.urls import reverse_lazy
-from django.utils import timezone
-from django.views.generic import DetailView
 
 from budget.forms.account import AccountForm
 from budget.mixins.create import CreateMixin
 from budget.mixins.delete import DeleteMixin
 from budget.mixins.list import ListMixin
 from budget.mixins.update import UpdateMixin
-from budget.models import Account, Transaction
-
-
-class AccountDetailView(LoginRequiredMixin, DetailView):
-    login_url = 'login'
-    model = Account
-    template_name = 'account_details.html'
-
-    def get_context_data(self, **kwargs):
-        ctx = super().get_context_data(**kwargs)
-
-        transactions = (
-            Transaction.objects.filter(account=self.object,
-                                       performed_date__month=timezone.now().month).order_by('-performed_date')
-        )
-
-        ctx['transactions'] = transactions
-
-        stats = transactions.aggregate(
-            income=Coalesce(Sum("amount", filter=Q(amount__gt=0)), Decimal("0")),
-            expenses=Coalesce(Sum("amount", filter=Q(amount__lt=0)), Decimal("0")),
-            total=Coalesce(Sum("amount"), Decimal("0")),
-        )
-        ctx['stats'] = stats
-
-        return ctx
+from budget.models import Account
 
 
 class AccountListView(ListMixin):

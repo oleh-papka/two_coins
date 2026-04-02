@@ -41,13 +41,13 @@
                                                             data-bs-toggle="dropdown" aria-haspopup="true"
                                                             aria-expanded="false"></button>
                                                     <div class="dropdown-menu" aria-labelledby="expenseBtnGroup">
-                                                        <a class="dropdown-item"
+                                                        <a class="dropdown-item d-flex aling-items-center gap-2"
                                                            href="{% url 'category_update' object.pk %}">
                                                             <i class="bi bi-gear"></i> Update
                                                         </a>
 
                                                         {% if not object.is_system_reserved %}
-                                                            <a class="dropdown-item bg-danger"
+                                                            <a class="dropdown-item d-flex aling-items-center gap-2 bg-danger"
                                                                href="{% url 'category_delete' object.pk %}">
                                                                 <i class="bi bi-trash3"></i> Delete
                                                             </a>
@@ -84,13 +84,13 @@
                                                             data-bs-toggle="dropdown" aria-haspopup="true"
                                                             aria-expanded="false"></button>
                                                     <div class="dropdown-menu" aria-labelledby="expenseBtnGroup">
-                                                        <a class="dropdown-item"
+                                                        <a class="dropdown-item d-flex aling-items-center gap-2"
                                                            href="{% url 'category_update' object.pk %}">
                                                             <i class="bi bi-gear"></i> Update
                                                         </a>
 
                                                         {% if not object.is_system_reserved %}
-                                                            <a class="dropdown-item bg-danger"
+                                                            <a class="dropdown-item d-flex aling-items-center gap-2 bg-danger"
                                                                href="{% url 'category_delete' object.pk %}">
                                                                 <i class="bi bi-trash3"></i> Delete
                                                             </a>

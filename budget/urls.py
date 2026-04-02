@@ -1,6 +1,6 @@
 from django.urls import path
 
-from .views.account import AccountListView, AccountUpdateView, AccountDeleteView, AccountDetailView, AccountCreateView
+from .views.account import AccountListView, AccountUpdateView, AccountDeleteView, AccountCreateView
 from .views.category import CategoryListView, CategoryUpdateView, CategoryDeleteView, CategoryCreateView
 from .views.dashboard import DashboardView
 from .views.transaction import TransactionListView, TransactionCreateView, TransactionUpdateView, TransactionDeleteView
@@ -11,7 +11,6 @@ urlpatterns = [
     path('accounts/', AccountListView.as_view(), name="account_list"),
     path('accounts/<int:pk>/update/', AccountUpdateView.as_view(), name="account_update"),
     path('accounts/<int:pk>/delete/', AccountDeleteView.as_view(), name="account_delete"),
-    path('accounts/<int:pk>/', AccountDetailView.as_view(), name="account_detail"),
     path('accounts/add/', AccountCreateView.as_view(), name="account_add"),
     path('categories/', CategoryListView.as_view(), name="category_list"),
     path('categories/<int:pk>/update/', CategoryUpdateView.as_view(), name="category_update"),
