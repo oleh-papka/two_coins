@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django.forms',
     'django_filters',
+    'debug_toolbar',
     'core.apps.CoreConfig',
     'users.apps.UsersConfig',
     'budget.apps.BudgetConfig',
@@ -54,6 +55,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    "debug_toolbar.middleware.DebugToolbarMiddleware",
 ]
 
 ROOT_URLCONF = 'two_coins.urls'
@@ -130,3 +132,7 @@ AUTH_USER_MODEL = 'users.User'
 
 LOGIN_URL = 'login'
 LOGIN_REDIRECT_URL = 'dashboard'
+
+INTERNAL_IPS = [
+    "127.0.0.1",
+]

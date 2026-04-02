@@ -34,6 +34,6 @@ class TransactionFilter(BootstrapFormMixin, django_filters.FilterSet):
             self.form.initial['date_to'] = last_day
 
         for name, field in self.form.fields.items():
-            field.widget.attrs['style'] = 'width: auto; max-width: 250px;'
+            field.widget.attrs['style'] = 'width: auto; min-width: 12rem;'
             if hasattr(field, "empty_label"):
                 field.empty_label = field.label
