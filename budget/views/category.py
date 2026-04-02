@@ -1,17 +1,10 @@
-from collections import defaultdict
 from datetime import datetime, date
-from decimal import Decimal
-from unicodedata import category
 
 from django.contrib import messages
-from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import Sum, F, Case, When, CharField, Value
-from django.db.models.functions import Coalesce
 from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404
 from django.urls import reverse_lazy
-from django.utils import timezone
-from django.views.generic import DetailView
 
 from budget.forms.category import CategoryForm, ReservedCategoryUpdateForm
 from budget.mixins.create import CreateMixin
@@ -20,25 +13,6 @@ from budget.mixins.list import ListMixin
 from budget.mixins.update import UpdateMixin
 from budget.models import Category, Transaction, Currency
 from core.services.date import DateService
-
-
-class CategoryDetailView(LoginRequiredMixin, DetailView):
-    login_url = 'login'
-    model = Category
-    template_name = 'category_details.html'
-
-    def get_context_data(self, **kwargs):
-        ctx = super().get_context_data(**kwargs)
-
-        transactions = (
-            Transaction.objects.filter(category=self.object, performed_date__month=timezone.now().month).order_by(
-                '-performed_date')
-        )
-
-        ctx['transactions'] = transactions
-        ctx['stats_total'] = transactions.aggregate(total=Coalesce(Sum("amount"), Decimal("0")))['total']
-
-        return ctx
 
 
 class CategoryListView(ListMixin):
@@ -69,8 +43,9 @@ class CategoryListView(ListMixin):
         currency_id = self.request.GET.get("currency_id") or 1
 
         base_txns = Transaction.objects.filter(
-            performed_date__range=(from_date, to_date)
-        )
+            performed_date__range=(from_date, to_date),
+            account__user=self.request.user,
+        ).order_by('-performed_date')
 
         currency_ids = base_txns.values_list("account__currency_id", flat=True).distinct()
         currencies = list(
@@ -93,7 +68,6 @@ class CategoryListView(ListMixin):
                 ),
                 category_name=F("category__name"),
             )
-            .exclude(account_amount=0)
             .values("type_name", "category_name")
             .annotate(total_amount=Sum("account_amount"))
             .order_by("type_name", "category_name")

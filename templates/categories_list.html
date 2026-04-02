@@ -29,13 +29,32 @@
                                 {% for object in object_list %}
                                     {% if object.category_type == '-' %}
                                         <li class="list-group-item d-flex justify-content-between align-items-center {{ object.color }} bg-opacity-75">
+                                            <h4 class="mb-0">{{ object.icon|default:'💳' }} {{ object.name }}</h4>
 
-                                            <a href="{% url 'category_detail' object.pk %}"
-                                               class="text-decoration-none text-body">
-                                                <h4 class="mb-0">{{ object.icon|default:'💳' }} {{ object.name }}</h4>
-                                            </a>
-                                            <a href="{% url 'transaction_add' %}?category={{ object.pk }}"
-                                               class="btn"><i class="bi bi-plus-square text-primary"></i></a>
+                                            <div class="btn-group" role="group">
+                                                <a href="{% url 'transaction_add' %}?category={{ object.pk }}"
+                                                   class="btn bg-body-tertiary"><i class="bi bi-dash-square text-danger"></i></a>
+
+                                                <div class="btn-group" role="group">
+                                                    <button id="expenseBtnGroup" type="button"
+                                                            class="btn dropdown-toggle bg-body-tertiary text-danger"
+                                                            data-bs-toggle="dropdown" aria-haspopup="true"
+                                                            aria-expanded="false"></button>
+                                                    <div class="dropdown-menu" aria-labelledby="expenseBtnGroup">
+                                                        <a class="dropdown-item"
+                                                           href="{% url 'category_update' object.pk %}">
+                                                            <i class="bi bi-gear"></i> Update
+                                                        </a>
+
+                                                        {% if not object.is_system_reserved %}
+                                                            <a class="dropdown-item bg-danger"
+                                                               href="{% url 'category_delete' object.pk %}">
+                                                                <i class="bi bi-trash3"></i> Delete
+                                                            </a>
+                                                        {% endif %}
+                                                    </div>
+                                                </div>
+                                            </div>
                                         </li>
                                     {% endif %}
                                 {% endfor %}
@@ -53,19 +72,37 @@
                                 {% for object in object_list %}
                                     {% if object.category_type == '+' %}
                                         <li class="list-group-item d-flex justify-content-between align-items-center {{ object.color }} bg-opacity-75">
+                                            <h4 class="mb-0">{{ object.icon|default:'💳' }} {{ object.name }}</h4>
 
-                                            <a href="{% url 'category_detail' object.pk %}"
-                                               class="text-decoration-none text-body">
-                                                <h4 class="mb-0">{{ object.icon|default:'💳' }} {{ object.name }}</h4>
-                                            </a>
-                                            <a href="{% url 'transaction_add' %}?category={{ object.pk }}"
-                                               class="btn"><i class="bi bi-plus-square text-primary"></i></a>
+                                            <div class="btn-group" role="group">
+                                                <a href="{% url 'transaction_add' %}?category={{ object.pk }}"
+                                                   class="btn bg-body-tertiary"><i class="bi bi-plus-square text-success"></i></a>
+
+                                                <div class="btn-group" role="group">
+                                                    <button id="expenseBtnGroup" type="button"
+                                                            class="btn dropdown-toggle bg-body-tertiary text-success"
+                                                            data-bs-toggle="dropdown" aria-haspopup="true"
+                                                            aria-expanded="false"></button>
+                                                    <div class="dropdown-menu" aria-labelledby="expenseBtnGroup">
+                                                        <a class="dropdown-item"
+                                                           href="{% url 'category_update' object.pk %}">
+                                                            <i class="bi bi-gear"></i> Update
+                                                        </a>
+
+                                                        {% if not object.is_system_reserved %}
+                                                            <a class="dropdown-item bg-danger"
+                                                               href="{% url 'category_delete' object.pk %}">
+                                                                <i class="bi bi-trash3"></i> Delete
+                                                            </a>
+                                                        {% endif %}
+                                                    </div>
+                                                </div>
+                                            </div>
                                         </li>
                                     {% endif %}
                                 {% endfor %}
 
                                 <li class="list-group-item">
-
                                     <a href="{% url 'category_add' %}?=category_type=+" class="btn w-100">
                                         Add new Category
                                     </a>

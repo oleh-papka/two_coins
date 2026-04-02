@@ -1,8 +1,7 @@
 from django.urls import path
 
 from .views.account import AccountListView, AccountUpdateView, AccountDeleteView, AccountDetailView, AccountCreateView
-from .views.category import CategoryListView, CategoryUpdateView, CategoryDeleteView, CategoryCreateView, \
-    CategoryDetailView
+from .views.category import CategoryListView, CategoryUpdateView, CategoryDeleteView, CategoryCreateView
 from .views.dashboard import DashboardView
 from .views.transaction import TransactionListView, TransactionCreateView, TransactionUpdateView, TransactionDeleteView
 from .views.transfer import TransferAddView, TransferUpdateView, TransferDeleteView
@@ -18,7 +17,6 @@ urlpatterns = [
     path('categories/<int:pk>/update/', CategoryUpdateView.as_view(), name="category_update"),
     path('categories/<int:pk>/delete/', CategoryDeleteView.as_view(), name="category_delete"),
     path('categories/add/', CategoryCreateView.as_view(), name="category_add"),
-    path('categories/<int:pk>/', CategoryDetailView.as_view(), name="category_detail"),
     path('transactions/', TransactionListView.as_view(), name="transaction_list"),
     path('transactions/add/', TransactionCreateView.as_view(), name="transaction_add"),
     path('transactions/<int:pk>/update/', TransactionUpdateView.as_view(), name="transaction_update"),
