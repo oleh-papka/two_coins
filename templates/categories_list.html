@@ -111,15 +111,6 @@
                                 {% endfor %}
                                 </tbody>
                             </table>
-
-                            <ul class="list-group list-group-flush border-top">
-                                <li class="list-group-item">
-                                    <a href="{% url 'category_add' %}?category_type=-" class="btn w-100">
-                                        Add new Category
-                                    </a>
-                                </li>
-                            </ul>
-
                         </div>
                         <div class="tab-pane fade" id="income" role="tabpanel">
 
@@ -170,16 +161,14 @@
                                 {% endfor %}
                                 </tbody>
                             </table>
-
-                            <ul class="list-group list-group-flush border-top">
-                                <li class="list-group-item">
-                                    <a href="{% url 'category_add' %}?category_type=+" class="btn w-100">
-                                        Add new Category
-                                    </a>
-                                </li>
-                            </ul>
                         </div>
                     </div>
+                </div>
+
+                <div class="card-footer">
+                    <a href="{% url 'category_add' %}" class="btn w-100">
+                        Add new Category
+                    </a>
                 </div>
             </div>
         </div>
@@ -189,17 +178,19 @@
                 <h3 class="card-header">Stats</h3>
 
                 {% for row in totals %}
-                    <ul class="list-group list-group-flush">
-                        <li class="list-group-item d-flex justify-content-between align-items-center bg-body-tertiary">
-                            <h4 class="mb-0">{{ row.currency_name }} {{ row.type_name }} total:</h4>
-                            <h4 class="mb-0">{{ row.total_amount|floatformat }} {{ row.currency_symbol }}</h4>
-                        </li>
-                    </ul>
+                    {% if row.total_amount != 0 %}
+                        <ul class="list-group list-group-flush">
+                            <li class="list-group-item d-flex justify-content-between align-items-center bg-body-tertiary">
+                                <h4 class="mb-0">{{ row.currency_name }} {{ row.type_name }} total:</h4>
+                                <h4 class="mb-0">{{ row.total_amount|floatformat }} {{ row.currency_symbol }}</h4>
+                            </li>
+                        </ul>
 
-                    {% if row.chart_data %}
-                        <div class="card-body">
-                            <div id="chart_{{ row.type_name }}" style="width: 100%;min-height: 300px;"></div>
-                        </div>
+                        {% if row.chart_data %}
+                            <div class="card-body">
+                                <div id="chart_{{ row.type_name }}" style="width: 100%;min-height: 300px;"></div>
+                            </div>
+                        {% endif %}
                     {% endif %}
                 {% endfor %}
             </div>

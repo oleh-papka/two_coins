@@ -51,7 +51,7 @@
                         <tbody>
                         {% for txn in object_list %}
                             <tr>
-                                <td class="d-none d-md-table-cell">{{ txn.performed_date|date:'d.m.Y' }}</td>
+                                <td class="d-none d-md-table-cell">{{ txn.performed_date|date:'d.m' }}</td>
                                 <td class="text-center">
                                     <h5 class="mb-0">
                                         <span class="badge {{ txn.account.color }}">{{ txn.account.name }}</span>
@@ -80,6 +80,12 @@
                         {% endfor %}
                         </tbody>
                     </table>
+                </div>
+
+                <div class="card-footer">
+                    <a href="{% url 'transaction_add' %}" class="btn w-100">
+                        Add new Transaction
+                    </a>
                 </div>
             </div>
         </div>
