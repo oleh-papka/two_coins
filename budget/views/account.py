@@ -8,7 +8,8 @@ from budget.mixins.create import CreateMixin
 from budget.mixins.delete import DeleteMixin
 from budget.mixins.list import ListMixin
 from budget.mixins.update import UpdateMixin
-from budget.models import Account
+from budget.models import Account, Transaction
+from core.services.date import DateService
 
 
 class AccountListView(ListMixin):
@@ -17,6 +18,46 @@ class AccountListView(ListMixin):
 
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
+
+        from_default, to_default = DateService.get_date_start_end()
+
+        from_date = DateService.parse_date(self.request.GET.get("from_date")) or from_default
+        to_date = DateService.parse_date(self.request.GET.get("to_date")) or to_default
+
+        account_id = self.request.GET.get("account_id") or self.object_list.first().id
+
+        account_selected = Account.objects.get(id=account_id)
+        base_txns = Transaction.objects.filter(
+            performed_date__range=(from_date, to_date),
+            account=account_selected,
+        ).order_by('-performed_date')
+
+        data = {
+            account_selected.created_at.strftime('%b'): account_selected.initial_balance
+        }
+
+        month = account_selected.created_at.strftime('%b')
+        month_total = float(account_selected.initial_balance)
+        totals_incomes = 0
+        totals_expenses = 0
+        for txn in base_txns:
+            if txn.account_amount > 0:
+                totals_incomes += float(txn.account_amount)
+            else:
+                totals_expenses += float(txn.account_amount)
+
+            if month == txn.performed_date.strftime('%b'):
+                month_total += float(txn.account_amount)
+            else:
+                data |= {
+                    month: month_total,
+                }
+                month = txn.performed_date.strftime('%b')
+                month_total = float(txn.account_amount)
+        else:
+            data |= {
+                month: month_total,
+            }
 
         totals = list(
             self.object_list.values(
@@ -48,7 +89,16 @@ class AccountListView(ListMixin):
             item['total_balance'] = float(item['total_balance'])
             item['chart_data'] = chart_data_map.get(item['currency_abbr'], [])
 
+        ctx['totals_chart_labels'] = [s for s in data.keys()]
+        ctx['totals_chart_data'] = [d for d in data.values()]
+        ctx['totals_chart_account'] = account_selected
+        ctx['totals_chart_incomes'] = totals_incomes
+        ctx['totals_chart_expenses'] = totals_expenses
+        ctx['totals_chart_total'] = float(account_selected.initial_balance) + totals_expenses + totals_incomes
         ctx['total_by_currency'] = totals
+        ctx["account_id"] = account_selected.id
+        ctx["from_date_value"] = from_date.strftime("%Y-%m-%d")
+        ctx["to_date_value"] = to_date.strftime("%Y-%m-%d")
         return ctx
 
 

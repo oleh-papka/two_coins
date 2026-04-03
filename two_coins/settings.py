@@ -131,7 +131,7 @@ STATIC_URL = 'static/'
 AUTH_USER_MODEL = 'users.User'
 
 LOGIN_URL = 'login'
-LOGIN_REDIRECT_URL = 'dashboard'
+LOGIN_REDIRECT_URL = 'account_list'
 
 INTERNAL_IPS = [
     "127.0.0.1",

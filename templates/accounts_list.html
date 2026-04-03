@@ -5,9 +5,47 @@
 
 
 {% block content %}
+    <div class="mb-4 bg-body-tertiary p-3 rounded border">
+        <form method="get" class="d-flex flex-wrap justify-content-between gap-3">
+            <div class="d-flex flex-wrap gap-3">
+                <div class="input-group  flex-fill" style="width: auto; min-width: 14rem;">
+                    <span class="input-group-text">From:</span>
+                    {# @formatter:off #}
+                    <input type="date" name="from_date" value="{{ from_date_value|default:'' }}"
+                           class="form-control" placeholder="Date" id="id_from_date">
+                    {# @formatter:on #}
+                </div>
+                <div class="input-group flex-fill" style="width: auto; min-width: 14rem;">
+                    <span class="input-group-text">To:</span>
+                    {# @formatter:off #}
+                    <input type="date" name="to_date" value="{{ to_date_value|default:'' }}"
+                           class="form-control" placeholder="Date" id="id_to_date">
+                    {# @formatter:on #}
+                </div>
+
+                <div class="input-group flex-fill" style="width: auto; min-width: 12rem;">
+                    <span class="input-group-text">Account:</span>
+                    <select class="form-select form-control" name="account_id">
+                        {% for account in object_list %}
+                            <option value="{{ account.id }}"
+                                    {% if account_id == account.id %}
+                                    selected
+                                    {% endif %} >{{ account.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+            <div class="d-flex gap-2">
+                <a href="?" class="btn">Reset</a>
+                <button class="btn btn-primary">Filter</button>
+            </div>
+        </form>
+
+    </div>
+
     <div class="d-flex flex-wrap justify-content-center gap-3 pb-3">
-        <div class="col" style="min-width:20rem ; max-width: 28rem;">
-            <div class="card">
+        <div class="col" style="min-width:20rem; max-width: 28rem;">
+            <div class="card mb-3">
                 <h3 class="card-header">All accounts</h3>
 
                 <div class="card-body p-0" style="max-height: 600px; overflow-y: scroll;">
@@ -78,9 +116,7 @@
                     </a>
                 </div>
             </div>
-        </div>
 
-        <div class="col" style="min-width: 22rem;">
             <div class="card">
                 <h3 class="card-header">Stats</h3>
 
@@ -94,10 +130,35 @@
 
                     {% if row.chart_data %}
                         <div class="card-body">
-                            <div id="{{ row.currency_abbr }}" style="width: 100%;min-height: 300px;"></div>
+                            <div id="{{ row.currency_abbr }}" style="width: 100%;height: 250px;"></div>
                         </div>
                     {% endif %}
                 {% endfor %}
+            </div>
+        </div>
+
+        <div class="col" style="min-width: 22rem;">
+            <div class="card">
+                <h3 class="card-header">Balance stats for {{ totals_chart_account }}</h3>
+
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item d-flex justify-content-between align-items-center text-danger">
+                        <h4 class="mb-0">Expenses:</h4>
+                        <h4 class="mb-0">{{ totals_chart_expenses|floatformat }} {{ totals_chart_account.currency.symbol }}</h4>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center text-success">
+                        <h4 class="mb-0">Incomes:</h4>
+                        <h4 class="mb-0">{{ totals_chart_incomes|floatformat }} {{ totals_chart_account.currency.symbol }}</h4>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center bg-body-tertiary">
+                        <h4 class="mb-0">Total:</h4>
+                        <h4 class="mb-0">{{ totals_chart_total|floatformat }} {{ totals_chart_account.currency.symbol }}</h4>
+                    </li>
+                </ul>
+
+                <div class="card-body">
+                    <div id="id_totals_chart" style="width: 100%;height: 500px;"></div>
+                </div>
             </div>
         </div>
     </div>
@@ -129,6 +190,81 @@
                 };
             }
 
+            function buildTotalsOption() {
+
+                const bs = getBootstrapThemeVars();
+                return {
+                    backgroundColor: 'transparent',
+                    tooltip: {
+                        trigger: 'axis',
+                        backgroundColor: bs.bodyBg,
+                        borderColor: bs.borderColor,
+                        borderWidth: 2,
+                        textStyle: {
+                            color: bs.bodyColor
+                        },
+                        formatter: function (params) {
+                            params = params[0];
+                            return `
+                            <div style="color:${bs.bodyColor}">
+                                <span style="font-weight:bold;color:${params.color};">
+                                    ${params.name}
+                                </span>: ${params.value} {{ totals_chart_account.currency.symbol }}
+                            </div>
+                        `;
+                        },
+                        axisPointer: {
+                            animation: false
+                        }
+                    },
+                    grid: {
+                        left: 20,
+                        right: 20,
+                        top: 10,
+                        bottom: 10
+                    },
+                    textStyle: {
+                        color: bs.bodyColor
+                    },
+                    xAxis: {
+                        type: 'category',
+                        data: {{ totals_chart_labels|safe }},
+                        axisLine: {
+                            lineStyle: {
+                                color: bs.borderColor
+                            }
+                        },
+                        axisLabel: {
+                            color: bs.secondaryColor
+                        }
+                    },
+                    yAxis: {
+                        type: 'value',
+                        axisLine: {
+                            show: false
+                        },
+                        splitLine: {
+                            lineStyle: {
+                                color: bs.borderColor
+                            }
+                        },
+                        axisLabel: {
+                            color: bs.secondaryColor
+                        }
+                    },
+                    series: [
+                        {
+                            data: {{ totals_chart_data|safe }},
+                            type: 'line'
+                        }
+                    ]
+                };
+            }
+
+            let totals_chart_dom = document.getElementById('id_totals_chart');
+            let totals_chart = echarts.init(totals_chart_dom);
+            totals_chart.setOption(buildTotalsOption());
+
             function buildOption(currency, data) {
                 const bs = getBootstrapThemeVars();
 
@@ -159,7 +295,7 @@
                         {
                             name: currency,
                             type: 'pie',
-                            radius: ['40%', '80%'],
+                            radius: ['40%', '85%'],
                             center: ['50%', '50%'],
                             avoidLabelOverlap: false,
                             padAngle: 4,
@@ -189,6 +325,9 @@
                     );
                     item.chart.resize();
                 });
+
+                totals_chart.setOption(buildTotalsOption(), true);
+                totals_chart.resize();
             }
 
             total_by_currency.forEach(function (row) {
@@ -212,16 +351,19 @@
                 });
             });
 
+
             window.addEventListener('resize', function () {
                 charts.forEach(function (item) {
                     item.chart.resize();
                 });
+                totals_chart.resize();
             });
 
             const resizeObserver = new ResizeObserver(function () {
                 charts.forEach(function (item) {
                     item.chart.resize();
                 });
+                totals_chart.resize();
             });
 
             charts.forEach(function (item) {

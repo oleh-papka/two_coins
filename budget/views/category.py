@@ -20,12 +20,10 @@ class CategoryListView(ListMixin):
     template_name = 'categories_list.html'
 
     def get_queryset(self):
-        return super().get_queryset().filter(user=self.request.user).order_by('is_system_reserved')
+        return super().get_queryset().order_by('is_system_reserved')
 
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
-
-
 
         from_default, to_default = DateService.get_date_start_end()
 
