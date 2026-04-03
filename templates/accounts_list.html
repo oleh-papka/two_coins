@@ -3,49 +3,385 @@
 
 {% block title %}🪙 2coins{% if title %} | {{ title }}{% else %}{% endif %}{% endblock %}
 
-{% block extra_css %}
-    {{ block.super }}
-    <style>
-        .card-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(18rem, 1fr));
-            gap: 1.3rem;
-            justify-items: center;
-            align-items: start;
-        }
-    </style>
-{% endblock %}
 
 {% block content %}
-    <div class="card-grid mb-3 tab-content bg-body-tertiary">
-        {% for object in object_list %}
-            <div class="card border-dark" style="max-width: 25rem; min-width: 18rem">
-
-                <h3 class="card-header {{ object.color }} bg-opacity-75">{{ object.icon|default:'💳' }} {{ object.name }}</h3>
-
-                <div class="card-body">
-                    <h2 class="card-title">{{ object.currency.symbol }} {{ object.balance|floatformat }} </h2>
-                    <h6 class="card-subtitle mb-3 text-muted">{{ object.description|default:'&nbsp;' }}</h6>
-
-                    <div class="d-flex justify-content-end gap-2 position-relative" style="z-index: 2;">
-                        <a href="{% url 'transaction_add' %}?account={{ object.pk }}"
-                           class="btn btn-primary flex-grow-1">
-                            Add transaction
-                        </a>
-                        <a href="{% url 'account_update' object.pk %}" class="btn"><i class="bi bi-gear"></i></a>
-                    </div>
+    <div class="mb-4 bg-body-tertiary p-3 rounded border">
+        <form method="get" class="d-flex flex-wrap justify-content-between gap-3">
+            <div class="d-flex flex-wrap gap-3">
+                <div class="input-group  flex-fill" style="width: auto; min-width: 14rem;">
+                    <span class="input-group-text">From:</span>
+                    {# @formatter:off #}
+                    <input type="date" name="from_date" value="{{ from_date_value|default:'' }}"
+                           class="form-control" placeholder="Date" id="id_from_date">
+                    {# @formatter:on #}
+                </div>
+                <div class="input-group flex-fill" style="width: auto; min-width: 14rem;">
+                    <span class="input-group-text">To:</span>
+                    {# @formatter:off #}
+                    <input type="date" name="to_date" value="{{ to_date_value|default:'' }}"
+                           class="form-control" placeholder="Date" id="id_to_date">
+                    {# @formatter:on #}
                 </div>
 
-                <a href="{% url 'account_detail' object.pk %}" class="stretched-link"></a>
+                <div class="input-group flex-fill" style="width: auto; min-width: 12rem;">
+                    <span class="input-group-text">Account:</span>
+                    <select class="form-select form-control" name="account_id">
+                        {% for account in object_list %}
+                            <option value="{{ account.id }}"
+                                    {% if account_id == account.id %}
+                                    selected
+                                    {% endif %} >{{ account.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
             </div>
-        {% endfor %}
+            <div class="d-flex gap-2">
+                <a href="?" class="btn">Reset</a>
+                <button class="btn btn-primary">Filter</button>
+            </div>
+        </form>
 
-        <div class="card border-dark h-100" style="max-width: 25rem; min-width: 18rem;">
-            <div class="card-body d-flex flex-column justify-content-center align-items-center text-center">
-                <a href="{% url 'account_add' %}" class="btn btn-secondary">
-                    Add new account
-                </a>
+    </div>
+
+    <div class="d-flex flex-wrap justify-content-center gap-3 pb-3">
+        <div class="col" style="min-width:20rem; max-width: 28rem;">
+            <div class="card mb-3">
+                <h3 class="card-header">All accounts</h3>
+
+                <div class="card-body p-0" style="max-height: 600px; overflow-y: scroll;">
+                    <table class="table table-striped mb-0 align-middle"
+                           style="border: transparent; font-size: medium;">
+                        <tbody>
+                        {% for object in object_list %}
+                            <tr>
+                                <td>
+                                    <h4 class="mb-0">
+                                        {{ object.icon|default:'💳' }} {{ object.name }}
+                                    </h4>
+                                </td>
+                                <td class="text-center">
+                                    <h4 class="mb-0">
+                                        {{ object.currency.symbol }} {{ object.balance|floatformat }}
+                                    </h4>
+                                </td>
+                                <td>
+                                    <h6 class="mb-0">
+                                        {{ object.description|default:'' }}
+                                    </h6>
+                                </td>
+                                <td class="text-end">
+                                    <div class="btn-group" role="group">
+                                        <a href="{% url 'transaction_add' %}?account={{ object.pk }}"
+                                           class="btn bg-body-tertiary"><i
+                                                class="bi bi-plus-square text-success"></i></a>
+
+                                        <div class="btn-group" role="group">
+                                            <button id="expenseBtnGroup" type="button"
+                                                    class="btn dropdown-toggle bg-body-tertiary text-success"
+                                                    data-bs-toggle="dropdown" aria-haspopup="true"
+                                                    aria-expanded="false"></button>
+                                            <div class="dropdown-menu" aria-labelledby="expenseBtnGroup">
+                                                <a href="{% url 'transfer_add' %}?account_from={{ object.pk }}"
+                                                   class="dropdown-item d-flex aling-items-center gap-2">
+                                                    <i class="bi bi-box-arrow-up-right"></i> Transfer
+                                                </a>
+
+                                                <a class="dropdown-item d-flex aling-items-center gap-2"
+                                                   href="{% url 'account_update' object.pk %}">
+                                                    <i class="bi bi-gear"></i> Update
+                                                </a>
+
+                                                <a class="dropdown-item d-flex aling-items-center gap-2 bg-danger"
+                                                   href="{% url 'account_delete' object.pk %}">
+                                                    <i class="bi bi-trash3"></i> Delete
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </td>
+
+                            </tr>
+                        {% empty %}
+                            <tr>
+                                <td class="text-muted text-center">No data</td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="card-footer">
+                    <a href="{% url 'account_add' %}" class="btn w-100">
+                        Add new Account
+                    </a>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3 class="card-header">Stats</h3>
+
+                {% for row in total_by_currency %}
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item d-flex justify-content-between align-items-center bg-body-tertiary">
+                            <h4 class="mb-0">{{ row.currency_name }} accounts total:</h4>
+                            <h4 class="mb-0">{{ row.total_balance|floatformat }} {{ row.currency_symbol }}</h4>
+                        </li>
+                    </ul>
+
+                    {% if row.chart_data %}
+                        <div class="card-body">
+                            <div id="{{ row.currency_abbr }}" style="width: 100%;height: 250px;"></div>
+                        </div>
+                    {% endif %}
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="col" style="min-width: 22rem;">
+            <div class="card">
+                <h3 class="card-header">Balance stats for {{ totals_chart_account }}</h3>
+
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item d-flex justify-content-between align-items-center text-danger">
+                        <h4 class="mb-0">Expenses:</h4>
+                        <h4 class="mb-0">{{ totals_chart_expenses|floatformat }} {{ totals_chart_account.currency.symbol }}</h4>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center text-success">
+                        <h4 class="mb-0">Incomes:</h4>
+                        <h4 class="mb-0">{{ totals_chart_incomes|floatformat }} {{ totals_chart_account.currency.symbol }}</h4>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center bg-body-tertiary">
+                        <h4 class="mb-0">Total:</h4>
+                        <h4 class="mb-0">{{ totals_chart_total|floatformat }} {{ totals_chart_account.currency.symbol }}</h4>
+                    </li>
+                </ul>
+
+                <div class="card-body">
+                    <div id="id_totals_chart" style="width: 100%;height: 500px;"></div>
+                </div>
             </div>
         </div>
     </div>
+{% endblock %}
+
+
+{% block extra_js %}
+    {{ block.super }}
+
+    <script src="https://cdn.jsdelivr.net/npm/echarts/dist/echarts.min.js"></script>
+
+    <script>
+        const total_by_currency = {{ total_by_currency|safe }};
+
+        document.addEventListener('DOMContentLoaded', function () {
+            function getBootstrapThemeVars() {
+                const root = document.documentElement;
+                const styles = getComputedStyle(root);
+                const theme = root.getAttribute('data-bs-theme') || 'light';
+
+                return {
+                    theme,
+                    isDark: theme === 'dark',
+                    bodyColor: styles.getPropertyValue('--bs-body-color').trim(),
+                    bodyBg: styles.getPropertyValue('--bs-body-bg').trim(),
+                    borderColor: styles.getPropertyValue('--bs-border-color').trim(),
+                    primary: styles.getPropertyValue('--bs-primary').trim(),
+                    secondaryColor: styles.getPropertyValue('--bs-secondary-color').trim()
+                };
+            }
+
+            function buildTotalsOption() {
+
+                const bs = getBootstrapThemeVars();
+                return {
+                    backgroundColor: 'transparent',
+                    tooltip: {
+                        trigger: 'axis',
+                        backgroundColor: bs.bodyBg,
+                        borderColor: bs.borderColor,
+                        borderWidth: 2,
+                        textStyle: {
+                            color: bs.bodyColor
+                        },
+                        formatter: function (params) {
+                            params = params[0];
+                            return `
+                            <div style="color:${bs.bodyColor}">
+                                <span style="font-weight:bold;color:${params.color};">
+                                    ${params.name}
+                                </span>: ${params.value} {{ totals_chart_account.currency.symbol }}
+                            </div>
+                        `;
+                        },
+                        axisPointer: {
+                            animation: false
+                        }
+                    },
+                    grid: {
+                        left: 20,
+                        right: 20,
+                        top: 10,
+                        bottom: 10
+                    },
+                    textStyle: {
+                        color: bs.bodyColor
+                    },
+                    xAxis: {
+                        type: 'category',
+                        data: {{ totals_chart_labels|safe }},
+                        axisLine: {
+                            lineStyle: {
+                                color: bs.borderColor
+                            }
+                        },
+                        axisLabel: {
+                            color: bs.secondaryColor
+                        }
+                    },
+                    yAxis: {
+                        type: 'value',
+                        axisLine: {
+                            show: false
+                        },
+                        splitLine: {
+                            lineStyle: {
+                                color: bs.borderColor
+                            }
+                        },
+                        axisLabel: {
+                            color: bs.secondaryColor
+                        }
+                    },
+                    series: [
+                        {
+                            data: {{ totals_chart_data|safe }},
+                            type: 'line'
+                        }
+                    ]
+                };
+            }
+
+            let totals_chart_dom = document.getElementById('id_totals_chart');
+            let totals_chart = echarts.init(totals_chart_dom);
+            totals_chart.setOption(buildTotalsOption());
+
+            function buildOption(currency, data) {
+                const bs = getBootstrapThemeVars();
+
+                return {
+                    backgroundColor: 'transparent',
+                    textStyle: {
+                        color: bs.bodyColor
+                    },
+                    tooltip: {
+                        trigger: 'item',
+                        backgroundColor: bs.bodyBg,
+                        borderColor: bs.borderColor,
+                        borderWidth: 2,
+                        textStyle: {
+                            color: bs.bodyColor
+                        },
+                        formatter: function (params) {
+                            return `
+                            <div style="color:${bs.bodyColor}">
+                                <span style="font-weight:bold;color:${params.color};">
+                                    ${params.name}
+                                </span>: ${params.value} ${currency}
+                            </div>
+                        `;
+                        }
+                    },
+                    series: [
+                        {
+                            name: currency,
+                            type: 'pie',
+                            radius: ['40%', '85%'],
+                            center: ['50%', '50%'],
+                            avoidLabelOverlap: false,
+                            padAngle: 4,
+                            itemStyle: {
+                                borderRadius: 10,
+                                borderColor: bs.bodyBg
+                            },
+                            label: {
+                                formatter: '{d}%',
+                                position: 'inside'
+                            },
+                            data: data
+                        }
+                    ]
+                };
+            }
+
+            if (!window.echarts || !Array.isArray(total_by_currency)) return;
+
+            const charts = [];
+
+            function renderAllCharts() {
+                charts.forEach(function (item) {
+                    item.chart.setOption(
+                        buildOption(item.currency_symbol, item.chart_data),
+                        true
+                    );
+                    item.chart.resize();
+                });
+
+                totals_chart.setOption(buildTotalsOption(), true);
+                totals_chart.resize();
+            }
+
+            total_by_currency.forEach(function (row) {
+                if (!row.chart_data || !row.chart_data.length) return;
+
+                const dom = document.getElementById(row.currency_abbr);
+                if (!dom) return;
+
+                const chart = echarts.init(dom);
+
+                chart.setOption(
+                    buildOption(row.currency_symbol, row.chart_data),
+                    true
+                );
+
+                charts.push({
+                    dom: dom,
+                    chart: chart,
+                    currency_symbol: row.currency_symbol,
+                    chart_data: row.chart_data
+                });
+            });
+
+
+            window.addEventListener('resize', function () {
+                charts.forEach(function (item) {
+                    item.chart.resize();
+                });
+                totals_chart.resize();
+            });
+
+            const resizeObserver = new ResizeObserver(function () {
+                charts.forEach(function (item) {
+                    item.chart.resize();
+                });
+                totals_chart.resize();
+            });
+
+            charts.forEach(function (item) {
+                resizeObserver.observe(item.dom);
+            });
+
+            const themeObserver = new MutationObserver(function (mutations) {
+                for (const mutation of mutations) {
+                    if (mutation.attributeName === 'data-bs-theme') {
+                        renderAllCharts();
+                        break;
+                    }
+                }
+            });
+
+            themeObserver.observe(document.documentElement, {
+                attributes: true
+            });
+        });
+    </script>
 {% endblock %}

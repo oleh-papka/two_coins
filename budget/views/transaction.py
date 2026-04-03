@@ -1,5 +1,6 @@
-from decimal import Decimal
+from collections import defaultdict
 
+from django.db.models import Sum
 from django.http import HttpResponseRedirect
 from django.urls import reverse_lazy
 from django_filters.views import FilterView
@@ -12,6 +13,7 @@ from budget.mixins.list import ListMixin
 from budget.mixins.update import UpdateMixin
 from budget.models import Account, Category, Transaction, Currency
 from budget.services.transaction import TransactionService
+from core.services.date import DateService
 
 
 class TransactionListView(FilterView, ListMixin):
@@ -20,7 +22,74 @@ class TransactionListView(FilterView, ListMixin):
     filterset_class = TransactionFilter
 
     def get_queryset(self):
-        return super().get_queryset().order_by('-performed_date')
+        from_default, to_default = DateService.get_date_start_end()
+
+        from_date = DateService.parse_date(self.request.GET.get("date_from")) or from_default
+        to_date = DateService.parse_date(self.request.GET.get("date_to")) or to_default
+
+        return super().get_queryset().filter(
+            performed_date__range=(from_date, to_date),
+            account__user=self.request.user
+        ).order_by('-performed_date')
+
+    def get_context_data(self, **kwargs):
+        ctx = super().get_context_data(**kwargs)
+
+        currencies = set(
+            self.object_list
+            .values_list('account__currency__id', flat=True).distinct()
+        )
+
+        charts_by_currency = []
+
+        for currency_id in currencies:
+            currency = Currency.objects.get(id=currency_id)
+            txns = (
+                self.object_list
+                .filter(account__currency=currency)
+                .select_related('category', 'account')
+                .order_by('performed_date')
+            )
+
+            transactions_by_date = defaultdict(dict)
+            categories_set = set()
+
+            for txn in txns:
+                date_key = txn.performed_date.strftime('%Y-%m-%d')
+                category_name = txn.category.name
+                categories_set.add(category_name)
+
+                # if multiple txns of same category exist on same day, sum them
+                transactions_by_date[date_key][category_name] = (
+                        transactions_by_date[date_key].get(category_name, 0) + float(txn.account_amount)
+                )
+
+            dates = sorted(transactions_by_date.keys())
+            categories = sorted(categories_set)
+
+            series = []
+            for category in categories:
+                series.append({
+                    "name": category,
+                    "type": "bar",
+                    "stack": "transactions",
+                    "data": [
+                        transactions_by_date[date].get(category, '-')
+                        for date in dates
+                    ],
+                })
+
+            charts_by_currency.append({
+                "total_amount": txns.aggregate(total=Sum("account_amount"))["total"],
+                "currency_name": currency.name,
+                "currency_symbol": currency.symbol,
+                "dates": dates,
+                "categories": categories,
+                "series": series,
+            })
+
+        ctx["charts_by_currency"] = charts_by_currency
+        return ctx
 
 
 class TransactionCreateView(CreateMixin):
