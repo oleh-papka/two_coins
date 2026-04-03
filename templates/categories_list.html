@@ -6,7 +6,7 @@
 
 {% block content %}
     <div class="d-flex flex-wrap justify-content-center gap-3 pb-3">
-        <div class="col col-md-3" style="width: 22rem;">
+        <div class="col" style="min-width:20rem ; max-width: 28rem;">
             <div class="card">
                 <h3 class="card-header">All categories</h3>
 
@@ -25,85 +25,116 @@
                 <div class="card-body p-0">
                     <div id="categories" class="tab-content p-0 m-0" style="border: none">
                         <div class="tab-pane fade active show" id="expense" role="tabpanel">
-                            <ul class="list-group list-group-flush">
+                            <table class="table table-striped mb-0 align-middle"
+                                   style="border: transparent; font-size: medium;">
+                                <tbody>
                                 {% for object in object_list %}
                                     {% if object.category_type == '-' %}
-                                        <li class="list-group-item d-flex justify-content-between align-items-center {{ object.color }} bg-opacity-75">
-                                            <h4 class="mb-0">{{ object.icon|default:'💳' }} {{ object.name }}</h4>
-
-                                            <div class="btn-group" role="group">
-                                                <a href="{% url 'transaction_add' %}?category={{ object.pk }}"
-                                                   class="btn bg-body-tertiary"><i class="bi bi-dash-square text-danger"></i></a>
-
+                                        <tr>
+                                            <td>
+                                                <h4 class="mb-0">
+                                                    {{ object.icon|default:'💳' }} {{ object.name }}
+                                                </h4>
+                                            </td>
+                                            <td class="text-end">
                                                 <div class="btn-group" role="group">
-                                                    <button id="expenseBtnGroup" type="button"
-                                                            class="btn dropdown-toggle bg-body-tertiary text-danger"
-                                                            data-bs-toggle="dropdown" aria-haspopup="true"
-                                                            aria-expanded="false"></button>
-                                                    <div class="dropdown-menu" aria-labelledby="expenseBtnGroup">
-                                                        <a class="dropdown-item d-flex aling-items-center gap-2"
-                                                           href="{% url 'category_update' object.pk %}">
-                                                            <i class="bi bi-gear"></i> Update
-                                                        </a>
+                                                    <a href="{% url 'transaction_add' %}?category={{ object.pk }}"
+                                                       class="btn bg-body-tertiary"><i
+                                                            class="bi bi-dash-square text-danger"></i></a>
 
-                                                        {% if not object.is_system_reserved %}
-                                                            <a class="dropdown-item d-flex aling-items-center gap-2 bg-danger"
-                                                               href="{% url 'category_delete' object.pk %}">
-                                                                <i class="bi bi-trash3"></i> Delete
+                                                    <div class="btn-group" role="group">
+                                                        <button id="expenseBtnGroup" type="button"
+                                                                class="btn dropdown-toggle bg-body-tertiary text-danger"
+                                                                data-bs-toggle="dropdown" aria-haspopup="true"
+                                                                aria-expanded="false"></button>
+                                                        <div class="dropdown-menu" aria-labelledby="expenseBtnGroup">
+                                                            <a class="dropdown-item d-flex aling-items-center gap-2"
+                                                               href="{% url 'category_update' object.pk %}">
+                                                                <i class="bi bi-gear"></i> Update
                                                             </a>
-                                                        {% endif %}
+
+                                                            {% if not object.is_system_reserved %}
+                                                                <a class="dropdown-item d-flex aling-items-center gap-2 bg-danger"
+                                                                   href="{% url 'category_delete' object.pk %}">
+                                                                    <i class="bi bi-trash3"></i> Delete
+                                                                </a>
+                                                            {% endif %}
+                                                        </div>
                                                     </div>
                                                 </div>
-                                            </div>
-                                        </li>
+                                            </td>
+                                        </tr>
                                     {% endif %}
+                                {% empty %}
+                                    <tr>
+                                        <td class="text-muted text-center">No data</td>
+                                    </tr>
                                 {% endfor %}
+                                </tbody>
+                            </table>
 
+                            <ul class="list-group list-group-flush border-top">
                                 <li class="list-group-item">
-
-                                    <a href="{% url 'category_add' %}?=category_type=-" class="btn w-100">
+                                    <a href="{% url 'category_add' %}?category_type=-" class="btn w-100">
                                         Add new Category
                                     </a>
                                 </li>
                             </ul>
+
                         </div>
                         <div class="tab-pane fade" id="income" role="tabpanel">
-                            <ul class="list-group list-group-flush">
+
+                            <table class="table table-striped mb-0 align-middle"
+                                   style="border: transparent; font-size: medium;">
+                                <tbody>
                                 {% for object in object_list %}
                                     {% if object.category_type == '+' %}
-                                        <li class="list-group-item d-flex justify-content-between align-items-center {{ object.color }} bg-opacity-75">
-                                            <h4 class="mb-0">{{ object.icon|default:'💳' }} {{ object.name }}</h4>
-
-                                            <div class="btn-group" role="group">
-                                                <a href="{% url 'transaction_add' %}?category={{ object.pk }}"
-                                                   class="btn bg-body-tertiary"><i class="bi bi-plus-square text-success"></i></a>
-
+                                        <tr>
+                                            <td>
+                                                <h4 class="mb-0">
+                                                    {{ object.icon|default:'💳' }} {{ object.name }}
+                                                </h4>
+                                            </td>
+                                            <td class="text-end">
                                                 <div class="btn-group" role="group">
-                                                    <button id="expenseBtnGroup" type="button"
-                                                            class="btn dropdown-toggle bg-body-tertiary text-success"
-                                                            data-bs-toggle="dropdown" aria-haspopup="true"
-                                                            aria-expanded="false"></button>
-                                                    <div class="dropdown-menu" aria-labelledby="expenseBtnGroup">
-                                                        <a class="dropdown-item d-flex aling-items-center gap-2"
-                                                           href="{% url 'category_update' object.pk %}">
-                                                            <i class="bi bi-gear"></i> Update
-                                                        </a>
+                                                    <a href="{% url 'transaction_add' %}?category={{ object.pk }}"
+                                                       class="btn bg-body-tertiary"><i
+                                                            class="bi bi-plus-square text-success"></i></a>
 
-                                                        {% if not object.is_system_reserved %}
-                                                            <a class="dropdown-item d-flex aling-items-center gap-2 bg-danger"
-                                                               href="{% url 'category_delete' object.pk %}">
-                                                                <i class="bi bi-trash3"></i> Delete
+                                                    <div class="btn-group" role="group">
+                                                        <button id="expenseBtnGroup" type="button"
+                                                                class="btn dropdown-toggle bg-body-tertiary text-success"
+                                                                data-bs-toggle="dropdown" aria-haspopup="true"
+                                                                aria-expanded="false"></button>
+                                                        <div class="dropdown-menu" aria-labelledby="expenseBtnGroup">
+                                                            <a class="dropdown-item d-flex aling-items-center gap-2"
+                                                               href="{% url 'category_update' object.pk %}">
+                                                                <i class="bi bi-gear"></i> Update
                                                             </a>
-                                                        {% endif %}
+
+                                                            {% if not object.is_system_reserved %}
+                                                                <a class="dropdown-item d-flex aling-items-center gap-2 bg-danger"
+                                                                   href="{% url 'category_delete' object.pk %}">
+                                                                    <i class="bi bi-trash3"></i> Delete
+                                                                </a>
+                                                            {% endif %}
+                                                        </div>
                                                     </div>
                                                 </div>
-                                            </div>
-                                        </li>
+                                            </td>
+                                        </tr>
                                     {% endif %}
+                                {% empty %}
+                                    <tr>
+                                        <td class="text-muted text-center">No data</td>
+                                    </tr>
                                 {% endfor %}
+                                </tbody>
+                            </table>
 
+                            <ul class="list-group list-group-flush border-top">
                                 <li class="list-group-item">
-                                    <a href="{% url 'category_add' %}?=category_type=+" class="btn w-100">
+                                    <a href="{% url 'category_add' %}?category_type=+" class="btn w-100">
                                         Add new Category
                                     </a>
                                 </li>
@@ -114,7 +145,7 @@
             </div>
         </div>
 
-        <div class="col" style="min-width: 23rem;">
+        <div class="col" style="min-width: 22rem;">
             <div class="card">
                 <h3 class="card-header">Stats</h3>
 
