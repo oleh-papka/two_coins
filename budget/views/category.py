@@ -25,20 +25,12 @@ class CategoryListView(ListMixin):
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
 
-        def parse_date(value):
-            if isinstance(value, date):
-                return value
-            if value:
-                try:
-                    return datetime.strptime(value, "%Y-%m-%d").date()
-                except ValueError:
-                    return None
-            return None
+
 
         from_default, to_default = DateService.get_date_start_end()
 
-        from_date = parse_date(self.request.GET.get("from_date")) or from_default
-        to_date = parse_date(self.request.GET.get("to_date")) or to_default
+        from_date = DateService.parse_date(self.request.GET.get("from_date")) or from_default
+        to_date = DateService.parse_date(self.request.GET.get("to_date")) or to_default
 
         currency_id = self.request.GET.get("currency_id") or 1
 

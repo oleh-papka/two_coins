@@ -14,3 +14,14 @@ class DateService:
         last_day = datetime.date(now.year, now.month, days_in_month)
 
         return first_day, last_day
+
+    @staticmethod
+    def parse_date(value):
+        if isinstance(value, datetime.date):
+            return value
+        if value:
+            try:
+                return datetime.datetime.strptime(value, "%Y-%m-%d").date()
+            except ValueError:
+                return None
+        return None

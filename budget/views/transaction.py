@@ -1,6 +1,6 @@
 from collections import defaultdict
 
-from django.db.models import F
+from django.db.models import Sum
 from django.http import HttpResponseRedirect
 from django.urls import reverse_lazy
 from django_filters.views import FilterView
@@ -13,6 +13,7 @@ from budget.mixins.list import ListMixin
 from budget.mixins.update import UpdateMixin
 from budget.models import Account, Category, Transaction, Currency
 from budget.services.transaction import TransactionService
+from core.services.date import DateService
 
 
 class TransactionListView(FilterView, ListMixin):
@@ -21,7 +22,15 @@ class TransactionListView(FilterView, ListMixin):
     filterset_class = TransactionFilter
 
     def get_queryset(self):
-        return super().get_queryset().order_by('-performed_date')
+        from_default, to_default = DateService.get_date_start_end()
+
+        from_date = DateService.parse_date(self.request.GET.get("date_from")) or from_default
+        to_date = DateService.parse_date(self.request.GET.get("date_to")) or to_default
+
+        return super().get_queryset().filter(
+            performed_date__range=(from_date, to_date),
+            account__user=self.request.user
+        ).order_by('-performed_date')
 
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
@@ -71,6 +80,7 @@ class TransactionListView(FilterView, ListMixin):
                 })
 
             charts_by_currency.append({
+                "total_amount": txns.aggregate(total=Sum("account_amount"))["total"],
                 "currency_name": currency.name,
                 "currency_symbol": currency.symbol,
                 "dates": dates,

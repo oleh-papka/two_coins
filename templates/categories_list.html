@@ -5,6 +5,45 @@
 
 
 {% block content %}
+    <div class="mb-4 bg-body-tertiary p-3 rounded border">
+        <form method="get" class="d-flex flex-wrap justify-content-between gap-3">
+            <div class="d-flex flex-wrap gap-3">
+                <div class="input-group  flex-fill" style="width: auto; min-width: 14rem;">
+                    <span class="input-group-text">From:</span>
+                    {# @formatter:off #}
+                    <input type="date" name="from_date" value="{{ from_date_value|default:'' }}"
+                           class="form-control" placeholder="Date" id="id_from_date">
+                    {# @formatter:on #}
+                </div>
+                <div class="input-group flex-fill" style="width: auto; min-width: 14rem;">
+                    <span class="input-group-text">To:</span>
+                    {# @formatter:off #}
+                    <input type="date" name="to_date" value="{{ to_date_value|default:'' }}"
+                           class="form-control" placeholder="Date" id="id_to_date">
+                    {# @formatter:on #}
+                </div>
+
+                <div class="input-group flex-fill" style="width: auto; min-width: 12rem;">
+                    <span class="input-group-text">Currency:</span>
+                    <select class="form-select form-control" name="currency_id">
+                        {% for currency in currencies %}
+                            <option value="{{ currency.id }}"
+                                    {% if currency_id == currency.id %}
+                                    selected
+                                    {% endif %} >{{ currency.abbr }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+            <div class="d-flex gap-2">
+                <a href="?" class="btn">Reset</a>
+                <button class="btn btn-primary">Filter</button>
+            </div>
+        </form>
+
+    </div>
+
+
     <div class="d-flex flex-wrap justify-content-center gap-3 pb-3">
         <div class="col" style="min-width:20rem ; max-width: 28rem;">
             <div class="card">
@@ -148,43 +187,6 @@
         <div class="col" style="min-width: 22rem;">
             <div class="card">
                 <h3 class="card-header">Stats</h3>
-
-                <div class="card-body">
-                    <form method="get" class="d-flex flex-wrap justify-content-between gap-3">
-                        <div class="d-flex flex-wrap gap-3">
-                            <div class="input-group  flex-fill" style="width: auto; min-width: 14rem;">
-                                <span class="input-group-text">From:</span>
-                                {# @formatter:off #}
-                                <input type="date" name="from_date" value="{{ from_date_value|default:'' }}"
-                                       class="form-control" placeholder="Date" id="id_from_date">
-                                {# @formatter:on #}
-                            </div>
-                            <div class="input-group flex-fill" style="width: auto; min-width: 14rem;">
-                                <span class="input-group-text">To:</span>
-                                {# @formatter:off #}
-                                <input type="date" name="to_date" value="{{ to_date_value|default:'' }}"
-                                       class="form-control" placeholder="Date" id="id_to_date">
-                                {# @formatter:on #}
-                            </div>
-
-                            <div class="input-group flex-fill" style="width: auto; min-width: 12rem;">
-                                <span class="input-group-text">Currency:</span>
-                                <select class="form-select form-control" name="currency_id">
-                                    {% for currency in currencies %}
-                                        <option value="{{ currency.id }}"
-                                                {% if currency_id == currency.id %}
-                                                selected
-                                                {% endif %} >{{ currency.abbr }}</option>
-                                    {% endfor %}
-                                </select>
-                            </div>
-                        </div>
-                        <div class="d-flex gap-2">
-                            <a href="." class="btn">Reset</a>
-                            <button class="btn btn-primary">Filter</button>
-                        </div>
-                    </form>
-                </div>
 
                 {% for row in totals %}
                     <ul class="list-group list-group-flush">
