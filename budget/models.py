@@ -1,9 +1,6 @@
-from decimal import Decimal
-
 from django.core.exceptions import ValidationError
 from django.db import models
-from django.db import transaction as db_transaction
-from django.db.models import F, Q
+from django.db.models import Q
 from django.db.models.constraints import CheckConstraint, UniqueConstraint
 from django.urls import reverse
 from django.utils import timezone
@@ -66,7 +63,7 @@ class Account(TimeStampMixin, StyleMixin):
         return f"{self.name} account"
 
     def get_absolute_url(self):
-        return reverse('account_detail', kwargs={'pk': self.pk})
+        return reverse('account_list')
 
 
 class SystemReservedQuerySet(models.QuerySet):
