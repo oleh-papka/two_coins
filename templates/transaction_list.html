@@ -45,7 +45,7 @@
                     Transactions
                 </h3>
 
-                <div class="card-body p-0" style="max-height: 400px; overflow-y: scroll;">
+                <div class="card-body p-0">
                     <table class="table table-striped mb-0 align-middle"
                            style="border: transparent; font-size: medium;">
                         <tbody>
@@ -181,6 +181,10 @@
                                 return '';
                             }
 
+                            const formatAmount = (value) => {
+                                return Number(value).toFixed(2);
+                            };
+
                             const rows = visibleItems
                                 .map(item => `
                                     <div style="color:${bs.bodyColor}; display:flex; justify-content:space-between; gap:12px;">
@@ -189,32 +193,42 @@
                                                 ${item.seriesName}
                                             </span>
                                         </span>
-                                        <span>${item.value} ${chartData.currency_symbol}</span>
+                                        <span>${formatAmount(item.value)} ${chartData.currency_symbol}</span>
                                     </div>
                                 `)
                                 .join('');
 
                             const showTotal = visibleItems.length >= 2;
+                            const dateLabel = visibleItems[0].axisValueLabel || visibleItems[0].name || '';
+
                             const total = showTotal
-                                ? visibleItems.reduce((sum, item) => sum + Number(item.value), 0)
+                                ? (
+                                    visibleItems.reduce((sum, item) => {
+                                        return sum + Math.round(Number(item.value) * 100);
+                                    }, 0) / 100
+                                )
                                 : null;
 
                             return `
-                                <div style="color:${bs.bodyColor}; min-width:180px;">
-                                    ${rows}
-                                    ${
+                            <div style="color:${bs.bodyColor}; min-width:180px;">
+                                <div style="margin-bottom:6px; padding-bottom:6px; border-bottom:1px solid ${bs.borderColor}; font-weight:600;">
+                                    ${dateLabel}
+                                </div>
+                                ${rows}
+                                ${
                                 showTotal
                                     ? `
-                                                <div style="margin-top:6px; padding-top:6px; border-top:1px solid ${bs.borderColor}; font-weight:600; display:flex; justify-content:space-between; gap:12px;">
-                                                    <span>Total</span>
-                                                    <span>${total} ${chartData.currency_symbol}</span>
-                                                </div>
-                                            `
+                                            <div style="margin-top:6px; padding-top:6px; border-top:1px solid ${bs.borderColor}; font-weight:600; display:flex; justify-content:space-between; gap:12px;">
+                                                <span>Total</span>
+                                                <span>${formatAmount(total)} ${chartData.currency_symbol}</span>
+                                            </div>
+                                        `
                                     : ''
                             }
-                                </div>
-                            `;
+                            </div>
+                        `;
                         }
+
                     },
                     legend: {
                         top: 0,

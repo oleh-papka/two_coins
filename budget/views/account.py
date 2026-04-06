@@ -1,6 +1,10 @@
+from calendar import month
 from collections import defaultdict
+from decimal import Decimal
 
+from debug_toolbar.panels import history
 from django.db.models import Sum, F
+from django.db.models.functions import TruncMonth
 from django.urls import reverse_lazy
 
 from budget.forms.account import AccountForm
@@ -30,34 +34,19 @@ class AccountListView(ListMixin):
         base_txns = Transaction.objects.filter(
             performed_date__range=(from_date, to_date),
             account=account_selected,
-        ).order_by('-performed_date')
+        ).order_by('performed_date')
 
-        data = {
-            account_selected.created_at.strftime('%b'): account_selected.initial_balance
-        }
+        ctx['totals_chart_labels'] = list()
+        ctx['totals_chart_data'] = list()
 
-        month = account_selected.created_at.strftime('%b')
-        month_total = float(account_selected.initial_balance)
         totals_incomes = 0
         totals_expenses = 0
+
         for txn in base_txns:
             if txn.account_amount > 0:
                 totals_incomes += float(txn.account_amount)
             else:
                 totals_expenses += float(txn.account_amount)
-
-            if month == txn.performed_date.strftime('%b'):
-                month_total += float(txn.account_amount)
-            else:
-                data |= {
-                    month: month_total,
-                }
-                month = txn.performed_date.strftime('%b')
-                month_total = float(txn.account_amount)
-        else:
-            data |= {
-                month: month_total,
-            }
 
         totals = list(
             self.object_list.values(
@@ -89,12 +78,31 @@ class AccountListView(ListMixin):
             item['total_balance'] = float(item['total_balance'])
             item['chart_data'] = chart_data_map.get(item['currency_abbr'], [])
 
-        ctx['totals_chart_labels'] = [s for s in data.keys()]
-        ctx['totals_chart_data'] = [d for d in data.values()]
+        history_txns = (
+            Transaction.objects
+            .filter(account=account_selected)
+            .annotate(month=TruncMonth('performed_date'))
+            .values('month')
+            .annotate(total=Sum('account_amount'))
+            .order_by('month')
+        )
+
+        ctx['totals_chart_labels'] = list()
+        ctx['totals_chart_data'] = list()
+
+        grand_total = 0
+        for txn in history_txns:
+            month = txn['month']
+            grand_total += txn['total']
+            if month.month == account_selected.created_at.month:
+                grand_total += account_selected.initial_balance
+            ctx['totals_chart_labels'].append(month.strftime('%b'))
+            ctx['totals_chart_data'].append(float(grand_total))
+
         ctx['totals_chart_account'] = account_selected
         ctx['totals_chart_incomes'] = totals_incomes
         ctx['totals_chart_expenses'] = totals_expenses
-        ctx['totals_chart_total'] = float(account_selected.initial_balance) + totals_expenses + totals_incomes
+        ctx['totals_chart_total'] = totals_expenses + totals_incomes
         ctx['total_by_currency'] = totals
         ctx["account_id"] = account_selected.id
         ctx["from_date_value"] = from_date.strftime("%Y-%m-%d")
