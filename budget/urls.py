@@ -1,4 +1,5 @@
 from django.urls import path
+from django.views.generic import RedirectView
 
 from .views.account import AccountListView, AccountUpdateView, AccountDeleteView, AccountCreateView
 from .views.category import CategoryListView, CategoryUpdateView, CategoryDeleteView, CategoryCreateView
@@ -6,6 +7,7 @@ from .views.transaction import TransactionListView, TransactionCreateView, Trans
 from .views.transfer import TransferAddView, TransferUpdateView, TransferDeleteView
 
 urlpatterns = [
+    path('', RedirectView.as_view(url='/accounts/', permanent=True)),
     path('accounts/', AccountListView.as_view(), name="account_list"),
     path('accounts/<int:pk>/update/', AccountUpdateView.as_view(), name="account_update"),
     path('accounts/<int:pk>/delete/', AccountDeleteView.as_view(), name="account_delete"),
