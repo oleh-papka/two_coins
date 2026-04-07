@@ -233,7 +233,10 @@
                         color: bs.bodyColor
                     },
                     tooltip: {
-                        trigger: 'item',
+                        trigger: 'axis',
+                        axisPointer: {
+                            type: 'shadow'
+                        },
                         backgroundColor: bs.bodyBg,
                         borderColor: bs.borderColor,
                         borderWidth: 2,
@@ -244,8 +247,8 @@
                             return `
                             <div style="color:${bs.bodyColor}">
                                 <span style="font-weight:bold;color:${params.color};">
-                                    ${params.name}
-                                </span>: ${params.value} ${currency}
+                                    ${params[0].name}
+                                </span>: ${params[0].value} ${currency}
                             </div>
                         `;
                         }

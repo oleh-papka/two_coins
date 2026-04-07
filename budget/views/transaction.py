@@ -46,7 +46,7 @@ class TransactionListView(FilterView, ListMixin):
             currency = Currency.objects.get(id=currency_id)
             txns = (
                 self.object_list
-                .filter(account__currency=currency)
+                .filter(account__currency=currency).exclude(category__is_transfer=True)
                 .select_related('category', 'account')
                 .order_by('performed_date')
             )
