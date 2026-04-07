@@ -13,6 +13,7 @@ from budget.mixins.delete import DeleteMixin
 from budget.mixins.list import ListMixin
 from budget.mixins.update import UpdateMixin
 from budget.models import Account, Transaction
+from budget.services.account import AccountService
 from core.services.date import DateService
 
 
@@ -122,6 +123,12 @@ class AccountCreateView(CreateMixin):
 class AccountUpdateView(UpdateMixin):
     model = Account
     form_class = AccountForm
+
+    def form_valid(self, form):
+        if 'balance' in form.changed_data:
+            AccountService.modify_account_balance(form.instance.pk, form.cleaned_data.get('balance', Decimal('0')))
+
+        return super().form_valid(form)
 
 
 class AccountDeleteView(DeleteMixin):
