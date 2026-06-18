@@ -1,8 +1,8 @@
-from calendar import month
+import datetime
 from collections import defaultdict
 from decimal import Decimal
 
-from debug_toolbar.panels import history
+from django.contrib import messages
 from django.db.models import Sum, F
 from django.db.models.functions import TruncMonth
 from django.urls import reverse_lazy
@@ -36,6 +36,33 @@ class AccountListView(ListMixin):
             performed_date__range=(from_date, to_date),
             account=account_selected,
         ).order_by('performed_date')
+
+        if not base_txns:
+            messages.info(self.request,
+                          f"For selected dates ({from_date}, {to_date}), no transactions found. Switched to last month.")
+
+            last_txns = Transaction.objects.filter(
+                account=account_selected,
+            ).order_by('-performed_date')
+
+            last_txn = last_txns.first()
+
+            to_date = last_txn.performed_date
+
+            if to_date.day == 1:
+                if to_date.month == 1:
+                    from_date = datetime.date(to_date.year - 1, 12, 1)
+                else:
+                    from_date = datetime.date(to_date.year, to_date.month - 1, 1)
+            else:
+                from_date = datetime.date(to_date.year, to_date.month, 1)
+
+            last_txns.filter(performed_date__range=(from_date, to_date))
+
+            base_txns = Transaction.objects.filter(
+                performed_date__range=(from_date, to_date),
+                account=account_selected,
+            ).order_by('performed_date')
 
         ctx['totals_chart_labels'] = list()
         ctx['totals_chart_data'] = list()
